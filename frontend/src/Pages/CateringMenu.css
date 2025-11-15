@@ -1,0 +1,207 @@
+/* ✅ Catering Menu Container */
+.catering-menu-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 40px 20px;
+  font-family: "Poppins", sans-serif;
+  color: #333;
+  text-align: center;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+/* ✅ Main Heading */
+h1 {
+  font-size: 36px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #222;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+  position: relative;
+}
+
+/* ✅ Animated Heading Underline */
+h1::after {
+  content: "";
+  width: 80px;
+  height: 4px;
+  background: #ff5733;
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+/* ✅ Section Styling */
+.package-section {
+  margin-bottom: 50px;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease-in-out;
+}
+
+/* ✅ Grid Layout for Multiple Boxes in a Single Row */
+.menu-options-container {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(220px, 1fr)
+  ); /* Auto adjusts to fit */
+  gap: 20px;
+  justify-content: center;
+  align-items: stretch;
+  margin-top: 20px;
+}
+
+/* ✅ Individual Menu Option */
+.menu-option {
+  background: #ffffff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 12px;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  min-width: 220px; /* Ensures boxes are aligned */
+}
+
+.menu-option:hover {
+  background: #fff3e6;
+  transform: scale(1.03);
+}
+
+/* ✅ Decorative Side Highlight */
+.menu-option::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 100%;
+  background: #ff5733;
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+/* ✅ Menu Option Titles */
+.menu-option h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff5733;
+  text-transform: capitalize;
+  margin-bottom: 10px;
+}
+
+/* ✅ Price Styling */
+.price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 12px;
+}
+
+/* ✅ List Styling */
+ul {
+  padding-left: 20px;
+  margin-top: 10px;
+}
+
+li {
+  font-size: 16px;
+  color: #555;
+  padding: 6px 0;
+  list-style: disc;
+}
+
+/* ✅ Order Button */
+/* ✅ Hero Buttons Container */
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 30px; /* ✅ Increased gap for better spacing */
+  margin-top: 25px;
+}
+
+/* ✅ CTA Button Styling */
+.cta-button {
+  padding: 14px 24px;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* ✅ Green Button for "Get Started" */
+.cta-button.green {
+  background: #2e7d32; /* Dark green */
+  color: white;
+}
+
+.cta-button.green:hover {
+  background: #1b5e20;
+  transform: scale(1.05);
+}
+
+/* ✅ White Outline Button for "Learn More" */
+.cta-button.outline {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+}
+
+.cta-button.outline:hover {
+  background: white;
+  color: black;
+  transform: scale(1.05);
+}
+
+/* ✅ Responsive Design */
+@media screen and (max-width: 768px) {
+  .catering-menu-container {
+    width: 95%;
+    padding: 25px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  h2 {
+    font-size: 20px;
+    padding: 10px;
+  }
+
+  .menu-options-container {
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(150px, 1fr)
+    ); /* Adjust for smaller screens */
+  }
+
+  .menu-option {
+    padding: 15px;
+  }
+
+  .menu-option h3 {
+    font-size: 18px;
+  }
+
+  .price {
+    font-size: 16px;
+  }
+
+  .cta-button {
+    font-size: 16px;
+    padding: 12px 18px;
+  }
+}

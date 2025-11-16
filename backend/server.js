@@ -1,17 +1,35 @@
 const express = require("express");
 const cors = require("cors");
-const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
+const helmet = require("helmet");
+const compression = require("compression");
 require("dotenv").config();
 const path = require("path");
 const orderRoutes = require("./routes/orders");
 const authRoutes = require("./routes/auth");
+const contactController = require("./controllers/contactController");
+const { validateContact, validateFranchise } = require("./middleware/validation");
+const { contactLimiter, apiLimiter } = require("./middleware/rateLimiter");
 
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// Security middleware
+app.use(helmet());
+
+// Compression middleware
+app.use(compression());
+
+// CORS configuration
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
+
+// Body parsing middleware
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // MongoDB Connection
 mongoose
@@ -21,78 +39,76 @@ mongoose
 
 const PORT = process.env.PORT || 5000;
 
-// Nodemailer Transporter
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER, // Your Gmail address
-    pass: process.env.EMAIL_PASS, // Your Gmail App Password
-  },
-});
+// Contact form endpoint
+app.post(
+  "/send-email",
+  contactLimiter,
+  validateContact,
+  contactController.sendContactEmail
+);
 
-// API to handle contact form submission
-app.post("/send-email", async (req, res) => {
-  const { fname, lname, email, phone, inquiryType, message } = req.body;
-
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: "charank5524@gmail.com", // Replace with your email
-    subject: `New Contact Form Submission from ${fname} ${lname}`,
-    text: `Name: ${fname} ${lname}\nEmail: ${email}\nPhone: ${phone}\nInquiry Type: ${inquiryType}\nMessage: ${message}`,
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    res
-      .status(200)
-      .json({ success: true, message: "Email sent successfully!" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Failed to send email" });
-  }
-});
-
-// API to handle franchise form submission
-app.post("/api/franchise-apply", async (req, res) => {
-  const {
-    name,
-    email,
-    phone,
-    location,
-    investmentBudget,
-    experience,
-    message,
-  } = req.body;
-
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: "charank5524@gmail.com",
-    subject: `New Franchise Application from ${name}`,
-    text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nLocation: ${location}\nInvestment Budget: ${investmentBudget}\nExperience: ${experience}\nMessage: ${message}`,
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    res.status(200).json({
-      success: true,
-      message: "Franchise application submitted successfully!",
-    });
-  } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to send application email" });
-  }
-});
+// Franchise application endpoint
+app.post(
+  "/api/franchise-apply",
+  contactLimiter,
+  validateFranchise,
+  contactController.sendFranchiseApplication
+);
 
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 
-// Error handling middleware
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+
+// Global error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: "Something went wrong!" });
+  console.error("Error:", err.stack);
+  
+  // Mongoose validation error
+  if (err.name === "ValidationError") {
+    return res.status(400).json({
+      success: false,
+      message: "Validation error",
+      errors: Object.values(err.errors).map((e) => e.message),
+    });
+  }
+
+  // Mongoose duplicate key error
+  if (err.code === 11000) {
+    return res.status(400).json({
+      success: false,
+      message: "Duplicate entry. This record already exists.",
+    });
+  }
+
+  // JWT errors
+  if (err.name === "JsonWebTokenError") {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid token",
+    });
+  }
+
+  if (err.name === "TokenExpiredError") {
+    return res.status(401).json({
+      success: false,
+      message: "Token expired",
+    });
+  }
+
+  // Default error
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal server error",
+    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+  });
 });
 
 app.get("/", (req, res) => {

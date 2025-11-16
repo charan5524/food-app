@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { menuCategories, menuItems } from "../data/menuData";
 import MenuItem from "../components/MenuItem";
 import Cart from "../components/Cart";
+import { MenuItemSkeleton } from "../components/LoadingSkeleton";
+import { useToast } from "../context/ToastContext";
 import "./Menu.css";
 
 const Menu = () => {
@@ -10,25 +12,34 @@ const Menu = () => {
   const [filteredItems, setFilteredItems] = useState(menuItems);
   const [cartItems, setCartItems] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
-    let filtered = menuItems;
+    setIsLoading(true);
+    // Simulate loading for better UX
+    const timer = setTimeout(() => {
+      let filtered = menuItems;
 
-    // Filter by category
-    if (selectedCategory !== "All") {
-      filtered = filtered.filter((item) => item.category === selectedCategory);
-    }
+      // Filter by category
+      if (selectedCategory !== "All") {
+        filtered = filtered.filter((item) => item.category === selectedCategory);
+      }
 
-    // Filter by search query
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (item) =>
-          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+      // Filter by search query
+      if (searchQuery) {
+        filtered = filtered.filter(
+          (item) =>
+            item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.description.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
 
-    setFilteredItems(filtered);
+      setFilteredItems(filtered);
+      setIsLoading(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [selectedCategory, searchQuery]);
 
   const handleAddToCart = (item) => {
@@ -37,12 +48,14 @@ const Menu = () => {
         (cartItem) => cartItem.id === item.id
       );
       if (existingItem) {
+        showToast(`${item.name} quantity updated!`, "success");
         return prevItems.map((cartItem) =>
           cartItem.id === item.id
             ? { ...cartItem, quantity: cartItem.quantity + 1 }
             : cartItem
         );
       }
+      showToast(`${item.name} added to cart!`, "success");
       return [...prevItems, { ...item, quantity: 1 }];
     });
     setShowCart(true);
@@ -100,7 +113,12 @@ const Menu = () => {
 
       <div className="menu-content">
         <div className="menu-items">
-          {filteredItems.length > 0 ? (
+          {isLoading ? (
+            // Show loading skeletons
+            Array.from({ length: 6 }).map((_, index) => (
+              <MenuItemSkeleton key={index} />
+            ))
+          ) : filteredItems.length > 0 ? (
             filteredItems.map((item) => (
               <MenuItem
                 key={item.id}

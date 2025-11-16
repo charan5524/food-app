@@ -5,21 +5,24 @@
 }
 
 section {
-  padding: 4rem 2rem;
+  padding: var(--spacing-3xl) var(--spacing-xl);
 }
 
 h2 {
   text-align: center;
-  margin-bottom: 2rem;
-  color: #1a1a1a;
-  font-size: 2rem;
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-dark);
+  font-size: 2.5rem;
   font-weight: 700;
+  font-family: var(--font-primary);
+  letter-spacing: -0.5px;
 }
 
 /* Hero Section */
 .hero {
   height: 90vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+  min-height: 600px;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
     url("https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=1920")
       center/cover no-repeat;
   display: flex;
@@ -28,76 +31,109 @@ h2 {
   text-align: center;
   color: #ffffff;
   position: relative;
+  animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .hero-content {
   max-width: 800px;
-  padding: 2rem;
-  background-color: rgba(0, 0, 0, 0.6);
-  border-radius: 15px;
-  backdrop-filter: blur(5px);
+  padding: var(--spacing-2xl);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-xl);
+  animation: slideUp 0.8s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero h1 {
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: var(--spacing-md);
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
   color: #ffffff;
   font-weight: 800;
+  font-family: var(--font-primary);
+  line-height: 1.2;
 }
 
 .hero p {
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  margin-bottom: var(--spacing-xl);
   color: #ffffff;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+  line-height: 1.6;
 }
 
 .cta-button {
   display: inline-block;
-  padding: 1rem 2rem;
-  background-color: #ff6b6b;
+  padding: var(--spacing-md) var(--spacing-2xl);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: #ffffff;
   text-decoration: none;
-  border-radius: 5px;
-  font-weight: bold;
-  transition: all 0.3s ease;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all var(--transition-base);
   text-shadow: none;
+  box-shadow: var(--shadow-md);
+  border: none;
+  cursor: pointer;
 }
 
 .cta-button:hover {
-  background-color: #ff5252;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Featured Categories */
 .featured-categories {
-  background-color: #f9f9f9;
+  background-color: var(--bg-light);
 }
 
 .category-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  gap: var(--spacing-xl);
   max-width: 1200px;
   margin: 0 auto;
 }
 
 .category-card {
-  background: white;
-  border-radius: 10px;
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
   height: 100%;
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--border-color);
 }
 
 .category-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-color);
 }
 
 .category-card img {
@@ -108,16 +144,19 @@ h2 {
 }
 
 .category-card h3 {
-  padding: 1rem;
+  padding: var(--spacing-md);
   margin: 0;
-  color: #1a1a1a;
+  color: var(--text-dark);
   font-weight: 600;
+  font-size: 1.5rem;
+  font-family: var(--font-primary);
 }
 
 .category-card p {
-  padding: 0 1rem 1rem;
-  color: #4a4a4a;
+  padding: 0 var(--spacing-md) var(--spacing-md);
+  color: var(--text-light);
   flex-grow: 1;
+  line-height: 1.6;
 }
 
 /* Special Offers */

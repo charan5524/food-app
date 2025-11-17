@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { menuCategories, menuItems } from "../data/menuData";
 import MenuItem from "../components/MenuItem";
-import Cart from "../components/Cart";
 import { MenuItemSkeleton } from "../components/LoadingSkeleton";
 import { useToast } from "../context/ToastContext";
+import { useCart } from "../context/CartContext";
 import "./Menu.css";
 
 const Menu = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredItems, setFilteredItems] = useState(menuItems);
-  const [cartItems, setCartItems] = useState([]);
-  const [showCart, setShowCart] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { showToast } = useToast();
+  const { addToCart, cartItems, getCartItemCount } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsLoading(true);
@@ -43,36 +44,13 @@ const Menu = () => {
   }, [selectedCategory, searchQuery]);
 
   const handleAddToCart = (item) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find(
-        (cartItem) => cartItem.id === item.id
-      );
-      if (existingItem) {
-        showToast(`${item.name} quantity updated!`, "success");
-        return prevItems.map((cartItem) =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
-      }
+    const existingItem = cartItems.find((cartItem) => cartItem.id === item.id);
+    if (existingItem) {
+      showToast(`${item.name} quantity updated!`, "success");
+    } else {
       showToast(`${item.name} added to cart!`, "success");
-      return [...prevItems, { ...item, quantity: 1 }];
-    });
-    setShowCart(true);
-  };
-
-  const handleRemoveFromCart = (itemId) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
-  };
-
-  const handleUpdateQuantity = (itemId, newQuantity) => {
-    if (newQuantity < 1) return;
-
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      )
-    );
+    }
+    addToCart(item);
   };
 
   return (
@@ -133,22 +111,11 @@ const Menu = () => {
           )}
         </div>
 
-        <div className={`cart-sidebar ${showCart ? "show" : ""}`}>
-          <button className="close-cart" onClick={() => setShowCart(false)}>
-            ×
-          </button>
-          <Cart
-            cartItems={cartItems}
-            onRemoveItem={handleRemoveFromCart}
-            onUpdateQuantity={handleUpdateQuantity}
-          />
-        </div>
       </div>
 
-      {cartItems.length > 0 && !showCart && (
-        <button className="cart-toggle" onClick={() => setShowCart(true)}>
-          View Cart (
-          {cartItems.reduce((total, item) => total + item.quantity, 0)} items)
+      {cartItems.length > 0 && (
+        <button className="cart-toggle" onClick={() => navigate("/cart")}>
+          View Cart ({getCartItemCount()} items)
         </button>
       )}
     </div>

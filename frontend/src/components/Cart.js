@@ -1,47 +1,95 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { orderService } from "../services/api";
+import { useToast } from "../context/ToastContext";
 import "./Cart.css";
 
 const Cart = ({ cartItems, onRemoveItem, onUpdateQuantity, onClearCart }) => {
-  const [showPayment, setShowPayment] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [paymentDetails, setPaymentDetails] = useState({
+  const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+
+  // Get user email from token if available
+  const getUserEmail = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const user = JSON.parse(atob(token.split(".")[1]));
+        return user.email || "";
+      } catch (e) {
+        return "";
+      }
+    }
+    return "";
+  };
+
+  const [checkoutForm, setCheckoutForm] = useState({
     name: "",
-    email: "",
-    phone: "",
     address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
+    phone: "",
+    email: "",
   });
 
-  const calculateTotal = () => {
+  useEffect(() => {
+    // Load user email from token
+    const email = getUserEmail();
+    if (email) {
+      setCheckoutForm((prev) => ({ ...prev, email }));
+    }
+  }, []);
+
+  useEffect(() => {
+    // Reset form when cart is cleared
+    if (cartItems.length === 0 && success) {
+      setShowCheckout(false);
+      setSuccess(false);
+    }
+  }, [cartItems.length, success]);
+
+  const calculateSubtotal = () => {
     return cartItems.reduce(
       (total, item) => total + item.price * item.quantity,
       0
     );
   };
 
+  const DELIVERY_FEE = 40;
+
+  const calculateTotal = () => {
+    return calculateSubtotal() + DELIVERY_FEE;
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setPaymentDetails((prev) => ({
+    setCheckoutForm((prev) => ({
       ...prev,
       [name]: value,
     }));
+    // Clear error when user starts typing
+    if (error) setError(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
+    setSuccess(false);
 
     // Check if user is logged in
     const token = localStorage.getItem("token");
     if (!token) {
       setError("Please log in to place an order");
+      setIsSubmitting(false);
+      navigate("/login");
+      return;
+    }
+
+    // Validate required fields
+    if (!checkoutForm.name.trim() || !checkoutForm.address.trim() || !checkoutForm.phone.trim()) {
+      setError("Please fill in all required fields");
       setIsSubmitting(false);
       return;
     }
@@ -55,82 +103,71 @@ const Cart = ({ cartItems, onRemoveItem, onUpdateQuantity, onClearCart }) => {
           quantity: item.quantity,
           image: item.image,
         })),
-        customerDetails: paymentDetails,
-        subtotal: calculateTotal(),
-        deliveryFee: 40,
-        total: calculateTotal() + 40,
+        customerDetails: {
+          name: checkoutForm.name.trim(),
+          email: checkoutForm.email.trim() || getUserEmail(),
+          phone: checkoutForm.phone.trim(),
+          address: checkoutForm.address.trim(),
+          city: "", // Optional field
+          state: "", // Optional field
+          zipCode: "", // Optional field
+        },
+        subtotal: calculateSubtotal(),
+        deliveryFee: DELIVERY_FEE,
+        total: calculateTotal(),
         status: "pending",
       };
 
-      console.log("Sending order data:", orderData);
+      // Create the order using the order service
+      const orderResult = await orderService.create(orderData);
 
-      // First, create the order
-      const orderResponse = await fetch("http://localhost:5000/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(orderData),
-      });
-
-      const orderResult = await orderResponse.json();
-
-      if (!orderResponse.ok) {
+      if (!orderResult.success) {
         throw new Error(orderResult.message || "Failed to create order");
       }
 
-      console.log("Order created successfully:", orderResult);
-
-      // Then, send the confirmation email
-      const emailResponse = await fetch(
-        "http://localhost:5000/api/orders/send-order-confirmation",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            email: paymentDetails.email,
-            orderId: orderResult.orderId,
-            orderDetails: orderData,
-          }),
+      // Send confirmation email if email is provided
+      if (checkoutForm.email.trim() || getUserEmail()) {
+        try {
+          await orderService.sendConfirmation(
+            checkoutForm.email.trim() || getUserEmail(),
+            orderResult.orderId,
+            orderData
+          );
+        } catch (emailError) {
+          console.warn("Failed to send confirmation email:", emailError);
+          // Don't fail the order if email fails
         }
-      );
-
-      if (!emailResponse.ok) {
-        const emailError = await emailResponse.json();
-        throw new Error(
-          emailError.message || "Failed to send confirmation email"
-        );
       }
 
-      alert(
-        "Order placed successfully! A confirmation email has been sent to your email address."
-      );
+      // Show success message
+      showToast("Order placed successfully! A confirmation email has been sent.", "success");
+      setSuccess(true);
 
-      // Reset form and cart
-      setShowPayment(false);
-      setPaymentDetails({
+      // Reset form and clear cart
+      const userEmail = getUserEmail();
+      setCheckoutForm({
         name: "",
-        email: "",
-        phone: "",
         address: "",
-        city: "",
-        state: "",
-        zipCode: "",
-        cardNumber: "",
-        expiryDate: "",
-        cvv: "",
+        phone: "",
+        email: userEmail,
       });
+      setShowCheckout(false);
 
       if (onClearCart) {
         onClearCart();
       }
+
+      // Redirect to home or orders page after a short delay
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
     } catch (error) {
       console.error("Error placing order:", error);
-      setError(error.message || "Failed to place order. Please try again.");
+      setError(
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to place order. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -140,209 +177,192 @@ const Cart = ({ cartItems, onRemoveItem, onUpdateQuantity, onClearCart }) => {
     <div className="cart-container">
       <h2>Your Cart</h2>
       {error && <div className="error-message">{error}</div>}
+      {success && (
+        <div className="success-message">
+          Order placed successfully! Redirecting...
+        </div>
+      )}
       {cartItems.length === 0 ? (
-        <p className="empty-cart">Your cart is empty</p>
+        <div className="empty-cart-state">
+          <p className="empty-cart">Your cart is empty</p>
+          <button
+            className="continue-shopping-btn"
+            onClick={() => navigate("/menu")}
+          >
+            Browse Menu
+          </button>
+        </div>
       ) : (
-        <>
-          <div className="cart-items">
-            {cartItems.map((item) => (
-              <div key={item.id} className="cart-item">
-                <img src={item.image} alt={item.name} />
-                <div className="item-details">
-                  <h3>{item.name}</h3>
-                  <p>₹{item.price}</p>
-                  <div className="quantity-controls">
+        <div className="cart-layout">
+          <div className="cart-main">
+            <div className="cart-items">
+              {cartItems.map((item) => (
+                <div key={item.id} className="cart-item">
+                  <img src={item.image} alt={item.name} />
+                  <div className="item-details">
+                    <h3>{item.name}</h3>
+                    <p className="item-price">₹{item.price.toFixed(2)}</p>
+                    <div className="quantity-controls">
+                      <button
+                        onClick={() =>
+                          onUpdateQuantity(item.id, item.quantity - 1)
+                        }
+                        disabled={item.quantity <= 1}
+                        aria-label="Decrease quantity"
+                      >
+                        -
+                      </button>
+                      <span className="quantity">{item.quantity}</span>
+                      <button
+                        onClick={() =>
+                          onUpdateQuantity(item.id, item.quantity + 1)
+                        }
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  <div className="item-total">
+                    <p>₹{(item.price * item.quantity).toFixed(2)}</p>
                     <button
-                      onClick={() =>
-                        onUpdateQuantity(item.id, item.quantity - 1)
-                      }
-                      disabled={item.quantity <= 1}
+                      className="remove-button"
+                      onClick={() => onRemoveItem(item.id)}
+                      aria-label="Remove item"
                     >
-                      -
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button
-                      onClick={() =>
-                        onUpdateQuantity(item.id, item.quantity + 1)
-                      }
-                    >
-                      +
+                      Remove
                     </button>
                   </div>
                 </div>
-                <button
-                  className="remove-button"
-                  onClick={() => onRemoveItem(item.id)}
-                >
-                  Remove
-                </button>
+              ))}
+            </div>
+
+            {!showCheckout ? (
+              <button
+                className="checkout-button"
+                onClick={() => setShowCheckout(true)}
+              >
+                Proceed to Checkout
+              </button>
+            ) : (
+              <div className="checkout-section">
+                <h3 className="checkout-title">Delivery Information</h3>
+                <form className="checkout-form" onSubmit={handleSubmit}>
+                  <div className="form-group">
+                    <label htmlFor="name">
+                      Full Name <span className="required">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={checkoutForm.name}
+                      onChange={handleInputChange}
+                      placeholder="Enter your full name"
+                      required
+                      disabled={isSubmitting}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="phone">
+                      Phone Number <span className="required">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={checkoutForm.phone}
+                      onChange={handleInputChange}
+                      placeholder="Enter your phone number"
+                      required
+                      disabled={isSubmitting}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="address">
+                      Delivery Address <span className="required">*</span>
+                    </label>
+                    <textarea
+                      id="address"
+                      name="address"
+                      value={checkoutForm.address}
+                      onChange={handleInputChange}
+                      placeholder="Enter your complete delivery address"
+                      rows="3"
+                      required
+                      disabled={isSubmitting}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="email">Email (Optional)</label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={checkoutForm.email}
+                      onChange={handleInputChange}
+                      placeholder="Enter your email for order confirmation"
+                      disabled={isSubmitting}
+                    />
+                    <small className="form-hint">
+                      We'll send order confirmation to this email
+                    </small>
+                  </div>
+
+                  <div className="form-buttons">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowCheckout(false);
+                        setError(null);
+                      }}
+                      disabled={isSubmitting}
+                      className="back-button"
+                    >
+                      Back to Cart
+                    </button>
+                    <button
+                      type="submit"
+                      className="submit-order-button"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Placing Order..." : "Place Order"}
+                    </button>
+                  </div>
+                </form>
               </div>
-            ))}
+            )}
           </div>
 
           <div className="cart-summary">
             <h3>Order Summary</h3>
-            <div className="summary-row">
-              <span>Subtotal:</span>
-              <span>₹{calculateTotal()}</span>
+            <div className="summary-content">
+              <div className="summary-row">
+                <span>Subtotal ({cartItems.reduce((sum, item) => sum + item.quantity, 0)} items):</span>
+                <span>₹{calculateSubtotal().toFixed(2)}</span>
+              </div>
+              <div className="summary-row">
+                <span>Delivery Fee:</span>
+                <span>₹{DELIVERY_FEE.toFixed(2)}</span>
+              </div>
+              <div className="summary-row total">
+                <span>Total:</span>
+                <span>₹{calculateTotal().toFixed(2)}</span>
+              </div>
             </div>
-            <div className="summary-row">
-              <span>Delivery Fee:</span>
-              <span>₹40</span>
-            </div>
-            <div className="summary-row total">
-              <span>Total:</span>
-              <span>₹{calculateTotal() + 40}</span>
-            </div>
-
-            {!showPayment ? (
+            {!showCheckout && (
               <button
                 className="checkout-button"
-                onClick={() => setShowPayment(true)}
+                onClick={() => setShowCheckout(true)}
               >
-                Proceed to Payment
+                Proceed to Checkout
               </button>
-            ) : (
-              <form className="payment-form" onSubmit={handleSubmit}>
-                <h3>Payment Details</h3>
-
-                <div className="form-group">
-                  <label>Full Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={paymentDetails.name}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={paymentDetails.email}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Phone Number</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={paymentDetails.phone}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Delivery Address</label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={paymentDetails.address}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>City</label>
-                    <input
-                      type="text"
-                      name="city"
-                      value={paymentDetails.city}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>State</label>
-                    <input
-                      type="text"
-                      name="state"
-                      value={paymentDetails.state}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>ZIP Code</label>
-                    <input
-                      type="text"
-                      name="zipCode"
-                      value={paymentDetails.zipCode}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Card Number</label>
-                  <input
-                    type="text"
-                    name="cardNumber"
-                    value={paymentDetails.cardNumber}
-                    onChange={handleInputChange}
-                    placeholder="1234 5678 9012 3456"
-                    required
-                  />
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Expiry Date</label>
-                    <input
-                      type="text"
-                      name="expiryDate"
-                      value={paymentDetails.expiryDate}
-                      onChange={handleInputChange}
-                      placeholder="MM/YY"
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>CVV</label>
-                    <input
-                      type="text"
-                      name="cvv"
-                      value={paymentDetails.cvv}
-                      onChange={handleInputChange}
-                      placeholder="123"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="form-buttons">
-                  <button
-                    type="button"
-                    onClick={() => setShowPayment(false)}
-                    disabled={isSubmitting}
-                  >
-                    Back to Cart
-                  </button>
-                  <button
-                    type="submit"
-                    className="pay-button"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? "Processing..." : "Pay Now"}
-                  </button>
-                </div>
-              </form>
             )}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

@@ -16,9 +16,11 @@ import Franchise from "./Pages/Franchise";
 import Catering from "./Pages/Catering";
 import Contact from "./Pages/Contact";
 import Footer from "./Pages/Footer";
+import CartPage from "./Pages/CartPage";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { CartProvider, useCart } from "./context/CartContext";
 
 import "./App.css";
 import logo from "./assets/logo.png";
@@ -37,10 +39,11 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [cartItemCount, setCartItemCount] = useState(0);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const user = token ? JSON.parse(atob(token.split(".")[1])) : null;
+  const { cartItems } = useCart();
+  const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,25 +51,6 @@ const Navbar = () => {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    // Get cart items from localStorage or context
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const count = cart.reduce((total, item) => total + (item.quantity || 1), 0);
-    setCartItemCount(count);
-
-    // Listen for cart updates
-    const handleStorageChange = () => {
-      const updatedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-      const updatedCount = updatedCart.reduce(
-        (total, item) => total + (item.quantity || 1),
-        0
-      );
-      setCartItemCount(updatedCount);
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   // Close dropdown when clicking outside
@@ -166,7 +150,7 @@ const Navbar = () => {
 
         <div className="navbar-right">
           <NavLink
-            to="/menu"
+            to="/cart"
             className="cart-icon-wrapper"
             onClick={() => setIsMobileMenuOpen(false)}
           >
@@ -239,6 +223,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/menu" element={<Menu />} />
+          <Route path="/cart" element={<CartPage />} />
           <Route path="/order" element={<Order />} />
           <Route path="/franchise" element={<Franchise />} />
           <Route path="/catering" element={<Catering />} />
@@ -266,7 +251,9 @@ function App() {
   return (
     <ErrorBoundary>
       <Router>
-        <AppContent />
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
       </Router>
     </ErrorBoundary>
   );

@@ -18,6 +18,7 @@ import Contact from "./Pages/Contact";
 import Footer from "./Pages/Footer";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 import "./App.css";
 import logo from "./assets/logo.png";
@@ -263,9 +264,11 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <AppContent />
+      </Router>
+    </ErrorBoundary>
   );
 }
 

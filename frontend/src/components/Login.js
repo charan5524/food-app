@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../services/api";
 import { useToast } from "../context/ToastContext";
+import { useAuth } from "../context/AuthContext";
 import "./Login.css";
 
 const Login = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { login, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -14,6 +16,13 @@ const Login = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -34,11 +43,8 @@ const Login = () => {
 
       // Backend returns { success: true, token, user }
       if (response.success && response.token) {
-        // Save token to localStorage
-        localStorage.setItem("token", response.token);
-        if (response.user) {
-          localStorage.setItem("user", JSON.stringify(response.user));
-        }
+        // Save token and user via AuthContext
+        login(response.token, response.user);
 
         // Show success message
         showToast("Login successful! Welcome back!", "success");

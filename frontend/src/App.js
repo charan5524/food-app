@@ -21,16 +21,38 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { CartProvider, useCart } from "./context/CartContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import "./App.css";
 import logo from "./assets/logo.png";
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    return <Navigate to="/login" />;
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div className="spinner" style={{ 
+            width: '40px', 
+            height: '40px', 
+            border: '4px solid #f3f3f3', 
+            borderTop: '4px solid #ff6b35', 
+            borderRadius: '50%', 
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto'
+          }}></div>
+          <p style={{ marginTop: '16px', color: '#666' }}>Loading...</p>
+        </div>
+      </div>
+    );
   }
+  
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+  
   return children;
 };
 
@@ -40,10 +62,10 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-  const user = token ? JSON.parse(atob(token.split(".")[1])) : null;
+  const { user, logout, isAuthenticated } = useAuth();
   const { cartItems } = useCart();
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const authenticated = isAuthenticated();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,11 +91,19 @@ const Navbar = () => {
   }, [isUserMenuOpen, isMobileMenuOpen]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("cart");
+    logout();
     setIsUserMenuOpen(false);
     navigate("/login");
   };
+
+  // Listen for auth logout events
+  useEffect(() => {
+    const handleAuthLogout = () => {
+      setIsUserMenuOpen(false);
+    };
+    window.addEventListener("authLogout", handleAuthLogout);
+    return () => window.removeEventListener("authLogout", handleAuthLogout);
+  }, []);
 
   return (
     <nav className={`navbar ${isScrolled ? "scrolled" : ""}`}>
@@ -149,18 +179,35 @@ const Navbar = () => {
         </ul>
 
         <div className="navbar-right">
-          <NavLink
-            to="/cart"
+          <div
             className="cart-icon-wrapper"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              if (authenticated) {
+                navigate("/cart");
+              } else {
+                navigate("/login");
+              }
+            }}
+            style={{ cursor: "pointer" }}
           >
             <FaShoppingCart />
             {cartItemCount > 0 && (
               <span className="cart-badge">{cartItemCount}</span>
             )}
-          </NavLink>
+          </div>
 
           <div className="user-menu-wrapper">
+            {authenticated && user && (
+              <span className="user-name-display" style={{ 
+                marginRight: '8px', 
+                fontSize: '0.9rem', 
+                color: 'var(--text-dark)',
+                fontWeight: '500'
+              }}>
+                {user.name || "User"}
+              </span>
+            )}
             <button
               className="user-menu-toggle"
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -170,11 +217,11 @@ const Navbar = () => {
             </button>
             {isUserMenuOpen && (
               <div className="user-dropdown">
-                {token ? (
+                {authenticated && user ? (
                   <>
                     <div className="user-info">
-                      <p className="user-name">{user?.name || "User"}</p>
-                      <p className="user-email">{user?.email || ""}</p>
+                      <p className="user-name">{user.name || "User"}</p>
+                      <p className="user-email">{user.email || ""}</p>
                     </div>
                     <NavLink
                       to="/dashboard"
@@ -183,7 +230,7 @@ const Navbar = () => {
                     >
                       Dashboard
                     </NavLink>
-                    <button className="dropdown-item" onClick={handleLogout}>
+                    <button className="dropdown-item logout-btn" onClick={handleLogout}>
                       Logout
                     </button>
                   </>
@@ -223,8 +270,22 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/menu" element={<Menu />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/order" element={<Order />} />
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <CartPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/order"
+            element={
+              <ProtectedRoute>
+                <Order />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/franchise" element={<Franchise />} />
           <Route path="/catering" element={<Catering />} />
           <Route path="/cateringmenu" element={<CateringMenu />} />
@@ -235,7 +296,12 @@ function AppContent() {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <div>Dashboard (Coming Soon)</div>
+                <div className="min-h-screen flex items-center justify-center">
+                  <div className="text-center">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+                    <p className="text-gray-600">Coming Soon</p>
+                  </div>
+                </div>
               </ProtectedRoute>
             }
           />
@@ -251,9 +317,11 @@ function App() {
   return (
     <ErrorBoundary>
       <Router>
-        <CartProvider>
-          <AppContent />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <AppContent />
+          </CartProvider>
+        </AuthProvider>
       </Router>
     </ErrorBoundary>
   );

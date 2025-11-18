@@ -6,6 +6,7 @@ import {
   NavLink,
   Navigate,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
 import { FaShoppingCart, FaUser, FaBars, FaTimes } from "react-icons/fa";
 import Home from "./Pages/Home";
@@ -17,6 +18,7 @@ import Catering from "./Pages/Catering";
 import Contact from "./Pages/Contact";
 import Footer from "./Pages/Footer";
 import CartPage from "./Pages/CartPage";
+import Dashboard from "./Pages/Dashboard";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -262,9 +264,12 @@ const Navbar = () => {
 };
 
 function AppContent() {
+  const location = useLocation();
+  const isDashboard = location.pathname === "/dashboard";
+
   return (
     <div className="App">
-      <Navbar />
+      {!isDashboard && <Navbar />}
 
       <div className="content">
         <Routes>
@@ -296,19 +301,14 @@ function AppContent() {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <div className="min-h-screen flex items-center justify-center">
-                  <div className="text-center">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-                    <p className="text-gray-600">Coming Soon</p>
-                  </div>
-                </div>
+                <Dashboard />
               </ProtectedRoute>
             }
           />
         </Routes>
       </div>
 
-      <Footer />
+      {!isDashboard && <Footer />}
     </div>
   );
 }

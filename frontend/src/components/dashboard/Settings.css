@@ -1,0 +1,216 @@
+.settings {
+  animation: fadeIn 0.3s ease;
+}
+
+.settings-section {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.dark .settings-section {
+  background: #2d2d2d;
+}
+
+.settings-section.danger-zone {
+  border: 2px solid #e74c3c;
+}
+
+.settings-section h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #1a1a1a;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.dark .settings-section h3 {
+  color: #e0e0e0;
+  border-bottom-color: #404040;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dark .setting-item {
+  border-bottom-color: #404040;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-info {
+  flex: 1;
+}
+
+.setting-label {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.setting-icon {
+  font-size: 20px;
+  color: #667eea;
+  flex-shrink: 0;
+}
+
+.setting-icon.danger {
+  color: #e74c3c;
+}
+
+.setting-label h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #1a1a1a;
+}
+
+.dark .setting-label h4 {
+  color: #e0e0e0;
+}
+
+.setting-label p {
+  font-size: 14px;
+  color: #666;
+}
+
+.dark .setting-label p {
+  color: #b0b0b0;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.language-select {
+  padding: 10px 15px;
+  border: 2px solid #e8e8e8;
+  border-radius: 8px;
+  font-size: 15px;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  min-width: 150px;
+}
+
+.dark .language-select {
+  background: #3a3a3a;
+  border-color: #404040;
+  color: #e0e0e0;
+}
+
+.language-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-change-password {
+  padding: 10px 20px;
+  background: #f8f9fa;
+  border: 2px solid #667eea;
+  color: #667eea;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dark .btn-change-password {
+  background: #3a3a3a;
+}
+
+.btn-change-password:hover {
+  background: #667eea;
+  color: white;
+}
+
+.btn-delete-account {
+  padding: 10px 20px;
+  background: #fee;
+  border: 2px solid #e74c3c;
+  color: #e74c3c;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dark .btn-delete-account {
+  background: #3a2a2a;
+}
+
+.btn-delete-account:hover {
+  background: #e74c3c;
+  color: white;
+}
+
+@media screen and (max-width: 768px) {
+  .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .toggle-switch,
+  .language-select,
+  .btn-change-password,
+  .btn-delete-account {
+    width: 100%;
+  }
+}
+

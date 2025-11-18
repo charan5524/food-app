@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const User = require("../models/User");
+const { sendWelcomeEmail } = require("./contactController");
 
 // Register a new user
 exports.register = async (req, res) => {
@@ -120,6 +121,23 @@ exports.register = async (req, res) => {
     console.log("Creating JWT token...");
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
     console.log("JWT token created successfully");
+
+    // Send welcome email (non-blocking - don't fail registration if email fails)
+    console.log(`📧 Attempting to send welcome email to ${user.email}...`);
+    sendWelcomeEmail(user.name, user.email)
+      .then((result) => {
+        if (result.success) {
+          console.log(`✅ Welcome email sent successfully to ${user.email}`);
+        } else {
+          console.warn(`⚠️  Failed to send welcome email to ${user.email}:`, result.message);
+          console.warn(`   This is non-critical - registration was successful`);
+        }
+      })
+      .catch((emailError) => {
+        console.error(`❌ Error sending welcome email to ${user.email}:`, emailError.message);
+        console.error(`   Error details:`, emailError);
+        // Don't throw - registration should succeed even if email fails
+      });
 
     console.log("Sending success response...");
     return res.status(201).json({

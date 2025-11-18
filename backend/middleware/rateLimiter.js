@@ -12,16 +12,41 @@ exports.apiLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Create a memory store for auth limiter (allows reset)
+const authLimiterStore = new rateLimit.MemoryStore();
+
 // Strict rate limiter for auth endpoints
-exports.authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // limit each IP to 5 requests per windowMs
-  message: {
-    success: false,
-    message: "Too many login attempts, please try again after 15 minutes.",
-  },
-  skipSuccessfulRequests: true,
-});
+// In development, make it very lenient or disable it
+const authLimiterConfig = process.env.NODE_ENV === "development" 
+  ? {
+      windowMs: 1 * 60 * 1000, // 1 minute
+      max: 1000, // Very high limit in development
+      message: {
+        success: false,
+        message: "Too many login attempts, please try again after a few minutes.",
+      },
+      skipSuccessfulRequests: true,
+      standardHeaders: true,
+      legacyHeaders: false,
+      store: authLimiterStore,
+    }
+  : {
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 5, // Strict limit in production
+      message: {
+        success: false,
+        message: "Too many login attempts, please try again after 15 minutes.",
+      },
+      skipSuccessfulRequests: true,
+      standardHeaders: true,
+      legacyHeaders: false,
+      store: authLimiterStore,
+    };
+
+exports.authLimiter = rateLimit(authLimiterConfig);
+
+// Export store for reset functionality
+exports.authLimiterStore = authLimiterStore;
 
 // Contact form rate limiter
 exports.contactLimiter = rateLimit({

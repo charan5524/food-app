@@ -284,6 +284,34 @@ Phone: +1 (555) 123-4567
 exports.sendContactEmail = async (req, res) => {
   try {
     const { fname, lname, email, phone, inquiryType, message } = req.body;
+
+    // Save feedback to database
+    const Feedback = require("../models/Feedback");
+    const Notification = require("../models/Notification");
+
+    try {
+      const feedback = new Feedback({
+        name: `${fname} ${lname}`,
+        email,
+        phone: phone || "",
+        inquiryType,
+        message,
+        status: "new",
+      });
+      await feedback.save();
+
+      // Create notification for admin
+      const notification = new Notification({
+        type: "feedback",
+        title: "New Feedback Received",
+        message: `${fname} ${lname} submitted a ${inquiryType} inquiry`,
+        link: `/admin/dashboard?section=feedback&id=${feedback._id}`,
+      });
+      await notification.save();
+    } catch (dbError) {
+      console.error("Error saving feedback to database:", dbError);
+      // Continue even if database save fails
+    }
     // All contact form submissions go to kanukulacharan@gmail.com
     const recipientEmail = "kanukulacharan@gmail.com";
 

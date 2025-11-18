@@ -22,6 +22,21 @@ exports.createOrder = async (req, res) => {
 
     const savedOrder = await order.save();
 
+    // Create notification for admin
+    try {
+      const Notification = require("../models/Notification");
+      const notification = new Notification({
+        type: "new_order",
+        title: "New Order Received",
+        message: `New order #${savedOrder._id.toString().slice(-6)} for $${savedOrder.total.toFixed(2)}`,
+        link: `/admin/dashboard?section=orders&id=${savedOrder._id}`,
+      });
+      await notification.save();
+    } catch (notifError) {
+      console.error("Error creating order notification:", notifError);
+      // Don't fail order creation if notification fails
+    }
+
     res.status(201).json({
       success: true,
       orderId: savedOrder._id,

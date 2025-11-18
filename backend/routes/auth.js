@@ -15,4 +15,7 @@ router.post(
 // Login user
 router.post("/login", authLimiter, validateLogin, authController.login);
 
+// Register admin (special endpoint - requires admin secret)
+router.post("/register-admin", authLimiter, authController.registerAdmin);
+
 module.exports = router;

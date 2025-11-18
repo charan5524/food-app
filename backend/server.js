@@ -149,6 +149,18 @@ app.post(
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 
+// Admin routes
+const adminRoutes = require("./routes/admin");
+app.use("/api/admin", adminRoutes);
+
+// Customer feedback routes (for customers to view their own tickets)
+const feedbackController = require("./controllers/feedbackController");
+const auth = require("./middleware/auth");
+app.get("/api/feedback/my-tickets", apiLimiter, auth, feedbackController.getMyFeedback);
+
+// Serve uploaded files
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // Development: Reset rate limit endpoint
 if (process.env.NODE_ENV === "development") {
   const { authLimiterStore } = require("./middleware/rateLimiter");

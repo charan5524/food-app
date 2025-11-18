@@ -11,8 +11,9 @@ const auth = async (req, res, next) => {
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded;
-      console.log("User authenticated:", decoded);
+      // Handle both token formats: { user: { email } } or { email }
+      req.user = decoded.user || decoded;
+      console.log("User authenticated:", req.user.email || req.user);
       next();
     } catch (error) {
       console.error("Token verification failed:", error);

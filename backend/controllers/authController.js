@@ -90,6 +90,23 @@ exports.register = async (req, res) => {
     // Hash password (handled by pre-save hook in User model)
     try {
       await user.save();
+      
+      // Create notification for admin (only for regular users, not admins)
+      if (user.role === "user") {
+        try {
+          const Notification = require("../models/Notification");
+          const notification = new Notification({
+            type: "new_user",
+            title: "New User Registered",
+            message: `${user.name} (${user.email}) just registered`,
+            link: `/admin/dashboard?section=users&id=${user._id}`,
+          });
+          await notification.save();
+        } catch (notifError) {
+          console.error("Error creating user notification:", notifError);
+          // Don't fail registration if notification fails
+        }
+      }
     } catch (saveError) {
       console.error("Error saving user:", saveError);
       // If it's a validation error from the model, handle it
@@ -147,6 +164,7 @@ exports.register = async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -252,6 +270,7 @@ exports.login = async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -263,3 +282,76 @@ exports.login = async (req, res) => {
   }
 };
 
+// Register admin (special endpoint - use with caution)
+exports.registerAdmin = async (req, res) => {
+  try {
+    const { name, email, password, adminSecret } = req.body;
+
+    // Check for admin secret (set this in your .env file)
+    const requiredSecret = process.env.ADMIN_REGISTRATION_SECRET || "admin-secret-2024";
+    
+    if (adminSecret !== requiredSecret) {
+      return res.status(403).json({
+        success: false,
+        message: "Invalid admin registration secret",
+      });
+    }
+
+    // Validate required fields
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide all required fields (name, email, password)",
+      });
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists with this email",
+      });
+    }
+
+    // Create new admin user
+    user = new User({
+      name,
+      email,
+      password,
+      role: "admin",
+    });
+
+    await user.save();
+
+    // Create JWT token
+    const payload = {
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
+
+    res.status(201).json({
+      success: true,
+      message: "Admin account created successfully",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Admin registration error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error during admin registration",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};

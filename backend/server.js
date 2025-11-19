@@ -149,6 +149,13 @@ app.post(
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 
+// Public menu routes (no authentication required)
+const menuController = require("./controllers/menuController");
+const categoryController = require("./controllers/categoryController");
+app.get("/api/menu", menuController.getPublicMenuItems);
+app.get("/api/menu/:id", menuController.getMenuItemById);
+app.get("/api/categories", categoryController.getPublicCategories);
+
 // Admin routes
 const adminRoutes = require("./routes/admin");
 app.use("/api/admin", adminRoutes);

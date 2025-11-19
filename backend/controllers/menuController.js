@@ -36,7 +36,7 @@ const upload = multer({
 
 exports.upload = upload.single("image");
 
-// Get all menu items
+// Get all menu items (admin - includes unavailable items)
 exports.getAllMenuItems = async (req, res) => {
   try {
     const menuItems = await MenuItem.find().sort({ createdAt: -1 });
@@ -52,6 +52,55 @@ exports.getAllMenuItems = async (req, res) => {
       message: "Error fetching menu items",
     });
   }
+};
+
+// Simple in-memory cache for public menu items (1 minute TTL)
+let publicMenuCache = {
+  data: null,
+  timestamp: null,
+  ttl: 60 * 1000, // 1 minute in milliseconds
+};
+
+// Get public menu items (only available items, optimized for customers)
+exports.getPublicMenuItems = async (req, res) => {
+  try {
+    // Check cache first
+    const now = Date.now();
+    if (publicMenuCache.data && publicMenuCache.timestamp && 
+        (now - publicMenuCache.timestamp) < publicMenuCache.ttl) {
+      return res.json(publicMenuCache.data);
+    }
+
+    // Only return available items, sorted by popular first, then by name
+    const menuItems = await MenuItem.find({ available: true })
+      .sort({ popular: -1, name: 1 })
+      .select('name description price category image popular available')
+      .lean(); // Use lean() for better performance
+    
+    const response = {
+      success: true,
+      menuItems,
+      count: menuItems.length,
+    };
+
+    // Update cache
+    publicMenuCache.data = response;
+    publicMenuCache.timestamp = now;
+    
+    res.json(response);
+  } catch (error) {
+    console.error("Error fetching public menu items:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching menu items",
+    });
+  }
+};
+
+// Clear public menu cache (call this when menu items are updated)
+exports.clearPublicMenuCache = () => {
+  publicMenuCache.data = null;
+  publicMenuCache.timestamp = null;
 };
 
 // Get menu item by ID
@@ -105,6 +154,9 @@ exports.createMenuItem = async (req, res) => {
 
     await menuItem.save();
 
+    // Clear public menu cache when menu is updated
+    exports.clearPublicMenuCache();
+
     res.status(201).json({
       success: true,
       message: "Menu item created successfully",
@@ -157,6 +209,9 @@ exports.updateMenuItem = async (req, res) => {
       if (popular !== undefined) menuItem.popular = popular;
 
       await menuItem.save();
+
+      // Clear public menu cache when menu is updated
+      exports.clearPublicMenuCache();
 
       // Check for low stock (if availability is set to false)
       if (menuItem.available === false) {
@@ -219,6 +274,9 @@ exports.deleteMenuItem = async (req, res) => {
     }
 
     await MenuItem.findByIdAndDelete(req.params.id);
+
+    // Clear public menu cache when menu is deleted
+    exports.clearPublicMenuCache();
 
     res.json({
       success: true,

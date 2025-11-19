@@ -18,7 +18,7 @@ const menuItemSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ["Breakfast", "Lunch", "Dinner", "Drinks", "Desserts", "Biryani", "Rice Dishes", "Curries", "Appetizers", "Vegetable Dishes", "Non-Veg Dry Items", "Breads"],
+    enum: ["Breakfast", "Lunch", "Dinner", "Drinks", "Beverages", "Desserts", "Biryani", "Rice Dishes", "Curries", "Appetizers", "Vegetable Dishes", "Non-Veg Dry Items", "Breads"],
   },
   image: {
     type: String,
@@ -47,6 +47,11 @@ menuItemSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });
+
+// Add indexes for better query performance
+menuItemSchema.index({ available: 1, popular: -1, name: 1 }); // For public menu queries
+menuItemSchema.index({ category: 1, available: 1 }); // For category filtering
+menuItemSchema.index({ createdAt: -1 }); // For admin listing
 
 module.exports = mongoose.model("MenuItem", menuItemSchema);
 

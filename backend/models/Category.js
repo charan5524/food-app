@@ -21,5 +21,8 @@ const categorySchema = new mongoose.Schema({
   },
 });
 
+// Add index for better query performance
+categorySchema.index({ name: 1 });
+
 module.exports = mongoose.model("Category", categorySchema);
 

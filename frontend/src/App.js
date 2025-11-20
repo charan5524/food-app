@@ -61,6 +61,16 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [pathname]);
+
+  return null;
+};
+
 // Navbar Component
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -331,6 +341,7 @@ function App() {
   return (
     <ErrorBoundary>
       <Router>
+        <ScrollToTop />
         <AuthProvider>
           <CartProvider>
             <AppContent />

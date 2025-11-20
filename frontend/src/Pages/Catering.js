@@ -20,15 +20,6 @@ function Catering() {
   const navigate = useNavigate();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [selectedPackageType, setSelectedPackageType] = useState("corporate");
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "auto" });
-  const goToMenu = () => {
-    navigate("/cateringmenu");
-    setTimeout(scrollToTop, 0);
-  };
-  const goToContact = () => {
-    navigate("/contact");
-    setTimeout(scrollToTop, 0);
-  };
 
   // Preload the image for better performance
   useEffect(() => {
@@ -209,16 +200,10 @@ function Catering() {
               attention to detail and uncompromising quality.
             </p>
             <div className="catering-hero-buttons">
-              <button
-                className="cta-button primary"
-                onClick={goToMenu}
-              >
+              <button className="cta-button primary" onClick={() => navigate("/cateringmenu")}>
                 View Packages →
               </button>
-              <button
-                className="cta-button secondary"
-                onClick={goToContact}
-              >
+              <button className="cta-button secondary" onClick={() => navigate("/contact")}>
                 Contact Us
               </button>
             </div>
@@ -289,7 +274,7 @@ function Catering() {
                     </li>
                   ))}
                 </ul>
-                <button className="cta-button secondary" onClick={goToMenu}>
+                <button className="cta-button secondary" onClick={() => navigate("/cateringmenu")}>
                   View Sample Menu
                 </button>
               </div>
@@ -338,7 +323,7 @@ function Catering() {
               <h3>Chef-led tasting experiences</h3>
               <p>Schedule an in-studio tasting or private demo for your planning committee.</p>
             </div>
-            <button className="cta-button primary" onClick={goToContact}>
+            <button className="cta-button primary" onClick={() => navigate("/contact")}>
               Book a tasting
             </button>
           </div>
@@ -370,12 +355,12 @@ function Catering() {
           <h2>Ready to Plan Your Event?</h2>
           <p>Share your vision with our planners for a tailored menu, styling, and service timeline.</p>
           <div className="cta-actions">
-            <button className="cta-button primary large" onClick={goToContact}>
+            <button className="cta-button primary large" onClick={() => navigate("/contact")}>
               Get a Quote
             </button>
             <button
               className="cta-button ghost large"
-              onClick={goToMenu}
+              onClick={() => navigate("/cateringmenu")}
             >
               Explore Sample Menus
             </button>

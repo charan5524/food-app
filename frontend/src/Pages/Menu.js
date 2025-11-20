@@ -1,47 +1,77 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { menuCategories, menuItems } from "../data/menuData";
 import MenuItem from "../components/MenuItem";
 import { MenuItemSkeleton } from "../components/LoadingSkeleton";
 import { useToast } from "../context/ToastContext";
 import { useCart } from "../context/CartContext";
+import { menuService } from "../services/api";
 import "./Menu.css";
 
 const Menu = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredItems, setFilteredItems] = useState(menuItems);
-  const [isLoading, setIsLoading] = useState(false);
+  const [menuItems, setMenuItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { showToast } = useToast();
   const { addToCart, cartItems, getCartItemCount } = useCart();
   const navigate = useNavigate();
 
+  // Fetch menu items and categories on component mount
   useEffect(() => {
-    setIsLoading(true);
-    // Simulate loading for better UX
-    const timer = setTimeout(() => {
-      let filtered = menuItems;
+    const fetchMenuData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        // Fetch menu items and categories in parallel for better performance
+        const [menuResponse, categoriesResponse] = await Promise.all([
+          menuService.getAllMenuItems(),
+          menuService.getAllCategories(),
+        ]);
 
-      // Filter by category
-      if (selectedCategory !== "All") {
-        filtered = filtered.filter((item) => item.category === selectedCategory);
+        // Map _id to id for compatibility with existing code
+        const itemsWithId = menuResponse.menuItems.map((item) => ({
+          ...item,
+          id: item._id || item.id,
+        }));
+
+        setMenuItems(itemsWithId);
+        setCategories(categoriesResponse.categories || []);
+      } catch (err) {
+        console.error("Error fetching menu data:", err);
+        setError("Failed to load menu. Please try again later.");
+        showToast("Failed to load menu items", "error");
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      // Filter by search query
-      if (searchQuery) {
-        filtered = filtered.filter(
-          (item) =>
-            item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.description.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      }
+    fetchMenuData();
+  }, [showToast]);
 
-      setFilteredItems(filtered);
-      setIsLoading(false);
-    }, 300);
+  // Filter items based on category and search query (memoized for performance)
+  const filteredItems = useMemo(() => {
+    let filtered = menuItems;
 
-    return () => clearTimeout(timer);
-  }, [selectedCategory, searchQuery]);
+    // Filter by category
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter((item) => item.category === selectedCategory);
+    }
+
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (item) =>
+          item.name.toLowerCase().includes(query) ||
+          item.description.toLowerCase().includes(query)
+      );
+    }
+
+    return filtered;
+  }, [menuItems, selectedCategory, searchQuery]);
 
   const handleAddToCart = (item) => {
     const existingItem = cartItems.find((cartItem) => cartItem.id === item.id);
@@ -74,15 +104,17 @@ const Menu = () => {
           >
             All
           </button>
-          {menuCategories.map((category) => (
+          {categories.map((category) => (
             <button
-              key={category.id}
+              key={category._id || category.name}
               className={`category-btn ${
                 selectedCategory === category.name ? "active" : ""
               }`}
               onClick={() => setSelectedCategory(category.name)}
             >
-              <span className="category-icon">{category.icon}</span>
+              {category.icon && (
+                <span className="category-icon">{category.icon}</span>
+              )}
               {category.name}
             </button>
           ))}
@@ -90,6 +122,18 @@ const Menu = () => {
       </div>
 
       <div className="menu-content">
+        {error && (
+          <div className="error-message" style={{ 
+            padding: "20px", 
+            textAlign: "center", 
+            color: "#ff6b35",
+            backgroundColor: "#fff5f5",
+            borderRadius: "8px",
+            margin: "20px 0"
+          }}>
+            {error}
+          </div>
+        )}
         <div className="menu-items">
           {isLoading ? (
             // Show loading skeletons
@@ -99,18 +143,21 @@ const Menu = () => {
           ) : filteredItems.length > 0 ? (
             filteredItems.map((item) => (
               <MenuItem
-                key={item.id}
+                key={item.id || item._id}
                 item={item}
                 onAddToCart={handleAddToCart}
               />
             ))
           ) : (
             <div className="no-items">
-              <p>No items found in this category.</p>
+              <p>
+                {searchQuery || selectedCategory !== "All"
+                  ? "No items found matching your criteria."
+                  : "No menu items available at the moment."}
+              </p>
             </div>
           )}
         </div>
-
       </div>
 
       {cartItems.length > 0 && (

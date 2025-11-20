@@ -1,120 +1,499 @@
-/* 🌟 Franchise Page Container */
-.franchise-container {
-  max-width: 900px;
-  margin: auto;
-  text-align: center;
-  padding: 30px;
+.franchise-page {
+  padding: 48px 5%;
+  background: #fefaf6;
+  color: #1a1a1a;
   font-family: "Poppins", sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
 }
 
-/* 🌟 Form Box Styling */
-.franchise-form-container {
-  background: linear-gradient(to bottom, #ffffff, #f8f8f8);
-  padding: 30px;
+.franchise-hero {
+  background: linear-gradient(135deg, #ffe8dc, #fff9f5);
+  border-radius: 24px;
+  padding: 48px;
+  box-shadow: 0 20px 60px rgba(255, 102, 0, 0.15);
+}
+
+.hero-content {
+  max-width: 900px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #ff7a18;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.franchise-hero h1 {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  margin-bottom: 16px;
+  color: #2c190a;
+}
+
+.hero-description {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #4a3c32;
+  max-width: 720px;
+  margin-bottom: 24px;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.primary-btn,
+.secondary-btn {
+  padding: 14px 28px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.primary-btn {
+  background: linear-gradient(120deg, #ff7a18, #ff512f);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(255, 122, 24, 0.35);
+}
+
+.secondary-btn {
+  background: rgba(255, 122, 24, 0.12);
+  color: #ff511f;
+  border: 1px solid rgba(255, 81, 31, 0.3);
+}
+
+.primary-btn:hover,
+.secondary-btn:hover {
+  transform: translateY(-2px);
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 18px;
+}
+
+.stat-card {
+  background: #fff;
+  padding: 18px;
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ff511f;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 0.95rem;
+  color: #5c4d43;
+}
+
+.franchise-benefits,
+.franchise-process,
+.franchise-investment,
+.franchise-form-section,
+.franchise-testimonials,
+.franchise-faq {
+  background: #fff;
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 18px 60px rgba(18, 21, 31, 0.08);
+}
+
+.franchise-benefits h2,
+.franchise-process h2,
+.franchise-form-section h2,
+.franchise-faq h2 {
+  font-size: 2rem;
+  margin-bottom: 12px;
+  color: #2c190a;
+}
+
+.section-subtitle {
+  color: #5c4d43;
+  max-width: 640px;
+  margin-bottom: 28px;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.benefit-card {
+  background: #fff8f2;
+  padding: 24px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 124, 50, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.benefit-icon {
+  font-size: 1.8rem;
+  color: #ff7a18;
+  margin-bottom: 6px;
+}
+
+.benefit-card h3 {
+  font-size: 1.2rem;
+  color: #2c190a;
+}
+
+.benefit-card p {
+  color: #5f4b40;
+  line-height: 1.5;
+}
+
+.process-header p {
+  color: #5c4d43;
+  max-width: 540px;
+}
+
+.process-timeline {
+  margin-top: 28px;
+  display: grid;
+  gap: 18px;
+}
+
+.process-step {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: #fff8f2;
+  border: 1px solid rgba(255, 122, 24, 0.12);
+}
+
+.step-marker {
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  max-width: 600px;
-  margin: auto;
-  transition: transform 0.2s ease-in-out;
+  background: #ff7a18;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.2rem;
 }
 
-.franchise-form-container:hover {
-  transform: scale(1.01);
+.franchise-investment .eyebrow {
+  margin-bottom: 6px;
 }
 
-/* 🌟 Form Layout with Two Columns */
+.investment-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.roi-card {
+  background: #fff3eb;
+  border-radius: 20px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #ff7a18;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(255, 122, 24, 0.2);
+}
+
+.roi-card svg {
+  font-size: 1.6rem;
+}
+
+.roi-title {
+  font-size: 0.9rem;
+  color: #7a5e4b;
+}
+
+.roi-value {
+  font-size: 1.6rem;
+  color: #ff511f;
+  margin: 0;
+}
+
+.investment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.investment-card {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  padding: 20px;
+  background: #fffaf4;
+}
+
+.investment-cost {
+  font-size: 1.6rem;
+  color: #ff7a18;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.resource-banner {
+  border-radius: 20px;
+  background: linear-gradient(120deg, #ffede0, #ffe1cc);
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.resource-banner h3 {
+  margin-bottom: 6px;
+}
+
+.secondary-btn.outlined {
+  border: 1.5px solid #ff7a18;
+  background: #fff;
+  color: #ff7a18;
+  box-shadow: none;
+}
+
+.franchise-form-wrapper {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+  margin-top: 24px;
+}
+
 .franchise-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 18px;
 }
 
-/* 🌟 Row for Side-by-Side Inputs */
 .form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.form-field {
   display: flex;
-  gap: 15px;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* Ensure Two Inputs Fit in One Row */
-.form-row input,
-.form-row select {
-  width: 48%;
+.form-field label {
+  font-weight: 600;
+  color: #3a2b25;
 }
 
-/* 🌟 Input Fields */
-.franchise-form input,
-.franchise-form select,
-.franchise-form textarea {
-  width: 100%;
-  padding: 14px;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: all 0.3s ease-in-out;
+.form-field input,
+.form-field select,
+.form-field textarea {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1.5px solid #e5d8cf;
   background: #fff;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* 🌟 Input Focus Effect */
-.franchise-form input:focus,
-.franchise-form select:focus,
-.franchise-form textarea:focus {
-  border-color: #ff6f61;
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  border-color: #ff7a18;
+  box-shadow: 0 0 0 3px rgba(255, 122, 24, 0.1);
   outline: none;
-  box-shadow: 0 0 8px rgba(255, 111, 97, 0.3);
-  background: #fffaf0;
 }
 
-/* 🌟 Submit Button */
-.submit-button {
-  background: linear-gradient(to right, #ff6f61, #ff9478);
-  color: white;
-  padding: 14px;
-  border: none;
-  font-size: 18px;
+.franchise-support-card {
+  background: #1b1a17;
+  color: #fff;
+  padding: 28px;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.franchise-support-card h3 {
+  font-size: 1.4rem;
+}
+
+.franchise-support-card ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.franchise-support-card li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #f3ebe1;
+}
+
+.contact-card {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contact-card a {
+  color: #ffd7a6;
+  text-decoration: none;
+  font-weight: 600;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.status-alert {
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.status-alert.success {
+  color: #0f9b55;
+}
+
+.status-alert.error {
+  color: #c62828;
+}
+
+.franchise-faq .faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.faq-item {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 18px 20px;
   cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.3s ease-in-out;
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.submit-button:hover {
-  background: linear-gradient(to right, #ff4500, #ff7347);
-  transform: scale(1.05);
-  box-shadow: 0px 4px 10px rgba(255, 69, 0, 0.4);
+.faq-item.open {
+  border-color: #ff7a18;
+  background: #fff8f2;
 }
 
-/* 🌟 Heading Styling */
-h1 {
-  font-size: 28px;
-  font-weight: bold;
-  color: #ff4500;
-  margin-bottom: 12px;
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #2c190a;
 }
 
-p {
-  color: #555;
-  font-size: 16px;
-  font-weight: 500;
+.faq-answer {
+  margin-top: 12px;
+  color: #5c4d43;
+  line-height: 1.6;
 }
 
-/* 🌟 Responsive Design */
-@media screen and (max-width: 768px) {
-  .franchise-form-container {
-    width: 90%;
+.franchise-testimonials {
+  text-align: center;
+}
+
+.testimonial-header p {
+  color: #5c4d43;
+  margin-top: 8px;
+}
+
+.testimonial-grid {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.testimonial-card {
+  background: #fff8f2;
+  border: 1px solid rgba(255, 122, 24, 0.15);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.testimonial-icon {
+  font-size: 1.6rem;
+  color: #ff7a18;
+}
+
+.quote {
+  font-size: 1rem;
+  color: #2c190a;
+  line-height: 1.6;
+}
+
+.author {
+  font-weight: 600;
+  color: #59493f;
+}
+
+@media (max-width: 900px) {
+  .franchise-form-wrapper {
+    grid-template-columns: 1fr;
   }
 
-  /* ✅ Stack Inputs on Small Screens */
-  .form-row {
+  .franchise-support-card {
+    order: -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .franchise-hero,
+  .franchise-benefits,
+  .franchise-process,
+  .franchise-investment,
+  .franchise-form-section,
+  .franchise-testimonials,
+  .franchise-faq {
+    padding: 28px;
+  }
+
+  .hero-cta {
     flex-direction: column;
   }
 
-  .form-row input,
-  .form-row select {
+  .primary-btn,
+  .secondary-btn {
     width: 100%;
+    text-align: center;
   }
 
-  .submit-button {
-    font-size: 16px;
-    padding: 12px;
+  .franchise-page {
+    padding: 32px 16px;
   }
 }

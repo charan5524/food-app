@@ -19,6 +19,9 @@ import Contact from "./Pages/Contact";
 import Footer from "./Pages/Footer";
 import CartPage from "./Pages/CartPage";
 import Dashboard from "./Pages/Dashboard";
+import AdminLogin from "./Pages/AdminLogin";
+import AdminRegister from "./Pages/AdminRegister";
+import AdminDashboard from "./Pages/AdminDashboard";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -266,10 +269,11 @@ const Navbar = () => {
 function AppContent() {
   const location = useLocation();
   const isDashboard = location.pathname === "/dashboard";
+  const isAdminDashboard = location.pathname.startsWith("/admin");
 
   return (
     <div className="App">
-      {!isDashboard && <Navbar />}
+      {!isDashboard && !isAdminDashboard && <Navbar />}
 
       <div className="content">
         <Routes>
@@ -305,10 +309,20 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/register" element={<AdminRegister />} />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </div>
 
-      {!isDashboard && <Footer />}
+      {!isDashboard && !isAdminDashboard && <Footer />}
     </div>
   );
 }

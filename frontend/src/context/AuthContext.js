@@ -18,8 +18,17 @@ export const AuthProvider = ({ children }) => {
   const decodeToken = (token) => {
     try {
       const decoded = JSON.parse(atob(token.split(".")[1]));
-      // Backend returns { user: { id, name, email } }
-      return decoded.user || decoded;
+      // Backend returns { user: { id, name, email, role } }
+      const userData = decoded.user || decoded;
+      // Also check localStorage for role if not in token
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          if (parsed.role) userData.role = parsed.role;
+        } catch (e) {}
+      }
+      return userData;
     } catch (error) {
       console.error("Error decoding token:", error);
       return null;
@@ -62,9 +71,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("token", token);
     if (userData) {
       localStorage.setItem("user", JSON.stringify(userData));
+      // Merge role into decoded token data
+      const decodedUser = decodeToken(token);
+      if (userData.role) decodedUser.role = userData.role;
+      setUser(decodedUser);
+    } else {
+      const decodedUser = decodeToken(token);
+      setUser(decodedUser);
     }
-    const decodedUser = decodeToken(token);
-    setUser(decodedUser);
   };
 
   const logout = () => {

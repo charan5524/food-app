@@ -17,6 +17,14 @@ router.post(
 // Get all orders for a user
 router.get("/", apiLimiter, auth, orderController.getUserOrders);
 
+// Download invoice
+router.get(
+  "/:id/invoice",
+  apiLimiter,
+  auth,
+  orderController.downloadInvoice
+);
+
 // Get a specific order
 router.get("/:id", apiLimiter, auth, orderController.getOrderById);
 

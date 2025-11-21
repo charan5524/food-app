@@ -41,6 +41,23 @@ const orderSchema = new mongoose.Schema({
     enum: ["pending", "confirmed", "preparing", "ready", "processing", "completed", "cancelled"],
     default: "pending",
   },
+  isScheduled: {
+    type: Boolean,
+    default: false,
+  },
+  scheduledDate: {
+    type: Date,
+    default: null,
+  },
+  scheduledTime: {
+    type: String, // Store as "HH:MM" format
+    default: null,
+  },
+  orderType: {
+    type: String,
+    enum: ["immediate", "scheduled"],
+    default: "immediate",
+  },
   createdAt: {
     type: Date,
     default: Date.now,

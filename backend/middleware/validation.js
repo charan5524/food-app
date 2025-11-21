@@ -74,10 +74,19 @@ exports.validateOrder = [
     .isLength({ min: 2 })
     .withMessage("Name is required"),
   body("customerDetails.email")
+    .optional({ checkFalsy: true })
     .trim()
-    .isEmail()
-    .normalizeEmail()
-    .withMessage("Valid email is required"),
+    .custom((value) => {
+      // If email is provided and not empty, it must be valid
+      if (value && value.length > 0) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+          throw new Error("Valid email is required");
+        }
+      }
+      return true;
+    })
+    .normalizeEmail(),
   body("customerDetails.phone")
     .trim()
     .matches(/^[\d\s\-\+\(\)]+$/)

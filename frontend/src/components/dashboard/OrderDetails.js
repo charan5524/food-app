@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   FaArrowLeft,
   FaCheckCircle,
@@ -10,17 +10,21 @@ import {
   FaPhone,
   FaEnvelope,
 } from "react-icons/fa";
+import { orderService } from "../../services/api";
+import DeliveryTracking from "../delivery/DeliveryTracking";
 import "./OrderDetails.css";
 
 const OrderDetails = ({ order, onBack }) => {
+  const [isDownloading, setIsDownloading] = useState(false);
+
   const getStatusSteps = () => {
     const statusOrder = ["pending", "processing", "completed"];
     const currentIndex = statusOrder.indexOf(order.status);
-    
+
     return statusOrder.map((status, index) => {
       const isActive = index <= currentIndex;
       const isCurrent = index === currentIndex;
-      
+
       let label, icon;
       switch (status) {
         case "pending":
@@ -39,12 +43,12 @@ const OrderDetails = ({ order, onBack }) => {
           label = status;
           icon = <FaClock />;
       }
-      
+
       return { status, label, icon, isActive, isCurrent };
     });
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       weekday: "long",
@@ -61,6 +65,29 @@ const OrderDetails = ({ order, onBack }) => {
   const tax = (subtotal * 0.1).toFixed(2); // 10% tax
   const total = order.total || 0;
 
+  const handleDownloadInvoice = async () => {
+    try {
+      setIsDownloading(true);
+      const blob = await orderService.downloadInvoice(order._id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute(
+        "download",
+        `invoice-${order._id.slice(-8).toUpperCase()}.pdf`
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading invoice:", error);
+      alert("Failed to download invoice. Please try again.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div className="order-details">
       <button className="back-button" onClick={onBack}>
@@ -71,7 +98,23 @@ const OrderDetails = ({ order, onBack }) => {
       <div className="section-header">
         <h2>Order Details</h2>
         <p>Order ID: #{order._id.slice(-8).toUpperCase()}</p>
+        {order.isScheduled && order.scheduledDate && (
+          <div className="scheduled-info-banner">
+            <FaClock />
+            <span>
+              Scheduled for {new Date(order.scheduledDate).toLocaleDateString()}{" "}
+              at {order.scheduledTime}
+            </span>
+          </div>
+        )}
       </div>
+
+      {/* Delivery Tracking - Show for delivery orders */}
+      {order.customerDetails?.address && (
+        <div style={{ marginBottom: "24px" }}>
+          <DeliveryTracking orderId={order._id} orderStatus={order.status} />
+        </div>
+      )}
 
       {/* Order Timeline */}
       <div className="order-timeline">
@@ -190,6 +233,13 @@ const OrderDetails = ({ order, onBack }) => {
             <p>
               <strong>Order Date:</strong> {formatDate(order.createdAt)}
             </p>
+            {order.isScheduled && order.scheduledDate && (
+              <p>
+                <strong>Scheduled Date & Time:</strong>{" "}
+                {new Date(order.scheduledDate).toLocaleDateString()} at{" "}
+                {order.scheduledTime}
+              </p>
+            )}
             <p>
               <strong>Payment Method:</strong>{" "}
               {order.paymentMethod || "Cash on Delivery"}
@@ -199,9 +249,13 @@ const OrderDetails = ({ order, onBack }) => {
       </div>
 
       <div className="order-actions-footer">
-        <button className="btn-download-invoice">
+        <button
+          className="btn-download-invoice"
+          onClick={handleDownloadInvoice}
+          disabled={isDownloading}
+        >
           <FaDownload />
-          Download Invoice
+          {isDownloading ? "Preparing Invoice..." : "Download Invoice"}
         </button>
       </div>
     </div>
@@ -209,4 +263,3 @@ const OrderDetails = ({ order, onBack }) => {
 };
 
 export default OrderDetails;
-

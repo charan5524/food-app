@@ -85,17 +85,100 @@ exports.createOrder = async (req, res) => {
 
     const savedOrder = await order.save();
 
+    // Auto-assign driver if order has delivery address
+    if (savedOrder.customerDetails?.address) {
+      try {
+        const deliveryController = require("./deliveryController");
+        // Import fake drivers and restaurant location
+        const FAKE_DRIVERS = [
+          {
+            name: "Ravi Kumar",
+            phone: "+91 9876543210",
+            vehicle: "AP 09 CD 1234",
+          },
+          {
+            name: "Suresh Reddy",
+            phone: "+91 9876543211",
+            vehicle: "TS 10 AB 5678",
+          },
+          {
+            name: "Kiran Patel",
+            phone: "+91 9876543212",
+            vehicle: "GJ 11 XY 9012",
+          },
+          {
+            name: "Amit Sharma",
+            phone: "+91 9876543213",
+            vehicle: "DL 12 MN 3456",
+          },
+          {
+            name: "Rajesh Singh",
+            phone: "+91 9876543214",
+            vehicle: "UP 13 PQ 7890",
+          },
+        ];
+        const RESTAURANT_LOCATION = {
+          lat: 17.385,
+          lng: 78.4867,
+        };
+
+        // Check if driver already assigned
+        if (!savedOrder.delivery?.driver?.name) {
+          const randomDriver =
+            FAKE_DRIVERS[Math.floor(Math.random() * FAKE_DRIVERS.length)];
+          const customerLocation = {
+            lat: RESTAURANT_LOCATION.lat + (Math.random() * 0.1 - 0.05),
+            lng: RESTAURANT_LOCATION.lng + (Math.random() * 0.1 - 0.05),
+          };
+          const estimatedArrival = new Date();
+          estimatedArrival.setMinutes(
+            estimatedArrival.getMinutes() + 5 + Math.floor(Math.random() * 5)
+          );
+
+          savedOrder.delivery = {
+            driver: {
+              name: randomDriver.name,
+              phone: randomDriver.phone,
+              vehicleNumber: randomDriver.vehicle,
+              vehicleType: "Bike",
+            },
+            status: "searching",
+            currentLocation: {
+              lat: RESTAURANT_LOCATION.lat + 0.02,
+              lng: RESTAURANT_LOCATION.lng + 0.02,
+            },
+            restaurantLocation: RESTAURANT_LOCATION,
+            customerLocation: customerLocation,
+            estimatedArrival: estimatedArrival,
+            statusHistory: [
+              {
+                status: "searching",
+                timestamp: new Date(),
+                message: "Searching for a driver nearby...",
+              },
+            ],
+          };
+          await savedOrder.save();
+        }
+      } catch (deliveryError) {
+        console.error("Error auto-assigning driver:", deliveryError);
+        // Don't fail order creation if driver assignment fails
+      }
+    }
+
     // Create notification for admin
     try {
       const Notification = require("../models/Notification");
       const orderTypeText = isScheduled ? "Scheduled Order" : "New Order";
-      const scheduledInfo = isScheduled 
+      const scheduledInfo = isScheduled
         ? ` (Scheduled: ${scheduledDate.toLocaleDateString()} at ${scheduledTime})`
         : "";
       const notification = new Notification({
         type: "new_order",
         title: `${orderTypeText} Received`,
-        message: `${orderTypeText} #${savedOrder._id.toString().slice(-6)} for ₹${savedOrder.total.toFixed(2)}${scheduledInfo}`,
+        message: `${orderTypeText} #${savedOrder._id
+          .toString()
+          .slice(-6)} for ₹${savedOrder.total.toFixed(2)}${scheduledInfo}`,
         link: `/admin/dashboard?section=orders&id=${savedOrder._id}`,
       });
       await notification.save();
@@ -184,23 +267,30 @@ exports.sendOrderConfirmation = async (req, res) => {
 
     const itemsList = orderDetails.items
       .map(
-        (item) =>
+        item =>
           `${item.name} x ${item.quantity} - ₹${item.price * item.quantity}`
       )
       .join("\n");
 
-    const scheduledInfo = orderDetails.isScheduled && orderDetails.scheduledDate
-      ? `<p><strong>Scheduled Date:</strong> ${new Date(orderDetails.scheduledDate).toLocaleDateString()}</p>
+    const scheduledInfo =
+      orderDetails.isScheduled && orderDetails.scheduledDate
+        ? `<p><strong>Scheduled Date:</strong> ${new Date(
+            orderDetails.scheduledDate
+          ).toLocaleDateString()}</p>
          <p><strong>Scheduled Time:</strong> ${orderDetails.scheduledTime}</p>`
-      : "";
+        : "";
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: `${orderDetails.isScheduled ? "Scheduled " : ""}Order Confirmation - Order #${orderId}`,
+      subject: `${
+        orderDetails.isScheduled ? "Scheduled " : ""
+      }Order Confirmation - Order #${orderId}`,
       html: `
         <h1>Thank you for your order!</h1>
-        <p>Your ${orderDetails.isScheduled ? "scheduled " : ""}order has been successfully placed.</p>
+        <p>Your ${
+          orderDetails.isScheduled ? "scheduled " : ""
+        }order has been successfully placed.</p>
         <h2>Order Details:</h2>
         <p><strong>Order ID:</strong> ${orderId}</p>
         <p><strong>Order Date:</strong> ${new Date().toLocaleDateString()}</p>
@@ -214,9 +304,15 @@ exports.sendOrderConfirmation = async (req, res) => {
         <p>
           ${orderDetails.customerDetails.name}<br>
           ${orderDetails.customerDetails.address}<br>
-          ${orderDetails.customerDetails.city}, ${orderDetails.customerDetails.state} ${orderDetails.customerDetails.zipCode}
+          ${orderDetails.customerDetails.city}, ${
+        orderDetails.customerDetails.state
+      } ${orderDetails.customerDetails.zipCode}
         </p>
-        <p>${orderDetails.isScheduled ? "We'll prepare your order for the scheduled date and time." : "We'll notify you when your order is ready for delivery."}</p>
+        <p>${
+          orderDetails.isScheduled
+            ? "We'll prepare your order for the scheduled date and time."
+            : "We'll notify you when your order is ready for delivery."
+        }</p>
       `,
     };
 
@@ -269,7 +365,11 @@ exports.downloadInvoice = async (req, res) => {
         .fontSize(26)
         .text("Food App", 50, 20, { align: "left" })
         .fontSize(14)
-        .text("Invoice", { align: "right", continued: false, width: doc.page.width - 100 })
+        .text("Invoice", {
+          align: "right",
+          continued: false,
+          width: doc.page.width - 100,
+        })
         .moveDown();
       doc.moveDown();
       doc.fillColor("black");
@@ -375,9 +475,9 @@ exports.downloadInvoice = async (req, res) => {
       );
       if (order.isScheduled && order.scheduledDate) {
         doc.text(
-          `Scheduled For: ${new Date(order.scheduledDate).toLocaleDateString()} ${
-            order.scheduledTime || ""
-          }`,
+          `Scheduled For: ${new Date(
+            order.scheduledDate
+          ).toLocaleDateString()} ${order.scheduledTime || ""}`,
           summaryX,
           doc.y
         );
@@ -394,10 +494,7 @@ exports.downloadInvoice = async (req, res) => {
       .moveDown()
       .fontSize(10)
       .fillColor(primaryColor)
-      .text(
-        "Thank you for your order!",
-        { align: "center" }
-      )
+      .text("Thank you for your order!", { align: "center" })
       .fillColor("black")
       .text(
         "If you have questions about this invoice, contact support@foodapp.com.",
@@ -413,4 +510,3 @@ exports.downloadInvoice = async (req, res) => {
     });
   }
 };
-

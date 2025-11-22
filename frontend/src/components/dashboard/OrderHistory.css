@@ -213,6 +213,23 @@
   margin-bottom: 20px;
 }
 
+.scheduled-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.scheduled-badge .info-label {
+  color: white;
+  font-weight: 600;
+}
+
+.scheduled-badge .info-value.scheduled {
+  color: white;
+  font-weight: 600;
+}
+
 .info-row {
   display: flex;
   justify-content: space-between;

@@ -124,6 +124,27 @@
   transform: translateY(-2px);
 }
 
+.btn-complete {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #38a169;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(56, 161, 105, 0.25);
+}
+
+.btn-complete:hover {
+  background: #2f855a;
+  transform: translateY(-2px);
+}
+
 .status-select {
   padding: 10px 16px;
   border: 2px solid;
@@ -229,6 +250,12 @@
   display: flex;
   gap: 15px;
   margin-top: 25px;
+}
+
+.modal-actions .btn-complete {
+  flex: 1;
+  justify-content: center;
+  box-shadow: none;
 }
 
 .btn-secondary {

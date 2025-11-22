@@ -16,7 +16,7 @@ const AdminRegister = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -24,7 +24,7 @@ const AdminRegister = () => {
     setError("");
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setError("");
     setLoading(true);
@@ -32,7 +32,9 @@ const AdminRegister = () => {
     try {
       // Call the admin registration endpoint
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/auth/register-admin`,
+        `${
+          process.env.REACT_APP_API_URL || "http://localhost:5000"
+        }/api/auth/register-admin`,
         {
           method: "POST",
           headers: {
@@ -45,7 +47,9 @@ const AdminRegister = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || `Error: ${response.status} ${response.statusText}`);
+        setError(
+          data.message || `Error: ${response.status} ${response.statusText}`
+        );
         return;
       }
 
@@ -57,7 +61,9 @@ const AdminRegister = () => {
       }
     } catch (err) {
       console.error("Registration error:", err);
-      setError("An error occurred. Please try again. Make sure the backend server is running.");
+      setError(
+        "An error occurred. Please try again. Make sure the backend server is running."
+      );
     } finally {
       setLoading(false);
     }
@@ -125,16 +131,19 @@ const AdminRegister = () => {
               required
               placeholder="Enter admin secret key"
             />
-            <small style={{ color: "#666", fontSize: "12px", marginTop: "5px", display: "block" }}>
+            <small
+              style={{
+                color: "#666",
+                fontSize: "12px",
+                marginTop: "5px",
+                display: "block",
+              }}
+            >
               Default: admin-secret-2024 (change in .env file)
             </small>
           </div>
 
-          <button
-            type="submit"
-            className="admin-login-btn"
-            disabled={loading}
-          >
+          <button type="submit" className="admin-login-btn" disabled={loading}>
             {loading ? "Creating Account..." : "Create Admin Account"}
           </button>
         </form>
@@ -153,4 +162,3 @@ const AdminRegister = () => {
 };
 
 export default AdminRegister;
-

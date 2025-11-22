@@ -296,6 +296,132 @@
   font-size: 0.875rem;
 }
 
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #ff6b35;
+}
+
+.checkbox-label span {
+  user-select: none;
+}
+
+input[type="date"],
+input[type="time"] {
+  width: 100%;
+  padding: 0.875rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s;
+  box-sizing: border-box;
+}
+
+input[type="date"]:focus,
+input[type="time"]:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+input[type="date"]:disabled,
+input[type="time"]:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+input[readonly] {
+  background-color: #f9f9f9;
+  cursor: default;
+}
+
+input[readonly]:focus {
+  border-color: #4a90e2;
+  background-color: #f9f9f9;
+}
+
+/* Address Autocomplete Styles */
+.address-autocomplete-wrapper {
+  position: relative;
+}
+
+.address-input-container {
+  position: relative;
+}
+
+.address-loading {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 0.875rem;
+  pointer-events: none;
+}
+
+.address-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.address-suggestion-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.address-suggestion-item:hover {
+  background-color: #f5f5f5;
+}
+
+.address-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.address-suggestions::-webkit-scrollbar {
+  width: 8px;
+}
+
+.address-suggestions::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.address-suggestions::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.address-suggestions::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 .form-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -426,4 +552,26 @@
   border-radius: 5px;
   border: 1px solid #f5c6cb;
   text-align: center;
+}
+
+.validation-errors-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0 0;
+  text-align: left;
+}
+
+.validation-errors-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f5c6cb;
+}
+
+.validation-errors-list li:last-child {
+  border-bottom: none;
+}
+
+.validation-errors-list li::before {
+  content: "⚠ ";
+  margin-right: 0.5rem;
+  font-weight: bold;
 }

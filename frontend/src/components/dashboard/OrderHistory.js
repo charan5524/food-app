@@ -163,6 +163,14 @@ const OrderHistory = () => {
               </div>
 
               <div className="order-info">
+                {order.isScheduled && order.scheduledDate && (
+                  <div className="info-row scheduled-badge">
+                    <span className="info-label">📅 Scheduled:</span>
+                    <span className="info-value scheduled">
+                      {new Date(order.scheduledDate).toLocaleDateString()} at {order.scheduledTime}
+                    </span>
+                  </div>
+                )}
                 <div className="info-row">
                   <span className="info-label">Date & Time:</span>
                   <span className="info-value">{formatDate(order.createdAt)}</span>

@@ -27,11 +27,24 @@ const OrderManagement = () => {
   };
 
   const handleStatusUpdate = async (orderId, newStatus) => {
+    if (newStatus === "completed") {
+      const confirmComplete = window.confirm(
+        "Mark this order as completed and notify the customer?"
+      );
+      if (!confirmComplete) {
+        return;
+      }
+    }
+
     try {
-      await adminService.updateOrderStatus(orderId, newStatus);
-      fetchOrders();
+      const response = await adminService.updateOrderStatus(orderId, newStatus);
+      await fetchOrders();
       if (selectedOrder && selectedOrder._id === orderId) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
+      }
+
+      if (response?.emailNotification) {
+        alert(response.emailNotification.message);
       }
     } catch (error) {
       console.error("Error updating order status:", error);
@@ -139,6 +152,14 @@ const OrderManagement = () => {
                   <option value="completed">Completed</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
+                {order.status !== "completed" && order.status !== "cancelled" && (
+                  <button
+                    className="btn-complete"
+                    onClick={() => handleStatusUpdate(order._id, "completed")}
+                  >
+                    <FaCheckCircle /> Complete & Notify
+                  </button>
+                )}
               </div>
             </div>
           ))
@@ -236,6 +257,17 @@ const OrderManagement = () => {
               >
                 Close
               </button>
+              {selectedOrder.status !== "completed" &&
+                selectedOrder.status !== "cancelled" && (
+                  <button
+                    className="btn-complete"
+                    onClick={() =>
+                      handleStatusUpdate(selectedOrder._id, "completed")
+                    }
+                  >
+                    <FaCheckCircle /> Complete & Notify
+                  </button>
+                )}
             </div>
           </div>
         </div>

@@ -38,8 +38,59 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["pending", "confirmed", "preparing", "ready", "processing", "completed", "cancelled"],
+    enum: [
+      "pending",
+      "confirmed",
+      "preparing",
+      "ready",
+      "processing",
+      "completed",
+      "cancelled",
+    ],
     default: "pending",
+  },
+  // Delivery Tracking Fields
+  delivery: {
+    driver: {
+      name: String,
+      phone: String,
+      vehicleNumber: String,
+      vehicleType: { type: String, default: "Bike" },
+    },
+    status: {
+      type: String,
+      enum: [
+        "searching",
+        "assigned",
+        "arriving_pickup",
+        "reached_pickup",
+        "picked_up",
+        "enroute",
+        "arriving",
+        "delivered",
+      ],
+      default: null,
+    },
+    currentLocation: {
+      lat: Number,
+      lng: Number,
+    },
+    restaurantLocation: {
+      lat: Number,
+      lng: Number,
+    },
+    customerLocation: {
+      lat: Number,
+      lng: Number,
+    },
+    estimatedArrival: Date,
+    statusHistory: [
+      {
+        status: String,
+        timestamp: Date,
+        message: String,
+      },
+    ],
   },
   isScheduled: {
     type: Boolean,

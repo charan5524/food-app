@@ -10,22 +10,22 @@ const api = axios.create({
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
-  (config) => {
+  config => {
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
+  error => {
     return Promise.reject(error);
   }
 );
 
 // Response interceptor for error handling
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  response => response,
+  error => {
     if (error.response?.status === 401) {
       // Unauthorized - clear token and redirect to login
       localStorage.removeItem("token");
@@ -37,11 +37,11 @@ api.interceptors.response.use(
 
 // Auth Service
 export const authService = {
-  login: async (credentials) => {
+  login: async credentials => {
     const response = await api.post("/api/auth/login", credentials);
     return response.data;
   },
-  register: async (userData) => {
+  register: async userData => {
     const response = await api.post("/api/auth/register", userData);
     return response.data;
   },
@@ -49,7 +49,7 @@ export const authService = {
 
 // Order Service
 export const orderService = {
-  create: async (orderData) => {
+  create: async orderData => {
     const response = await api.post("/api/orders", orderData);
     return response.data;
   },
@@ -57,8 +57,14 @@ export const orderService = {
     const response = await api.get("/api/orders");
     return response.data;
   },
-  getById: async (id) => {
+  getById: async id => {
     const response = await api.get(`/api/orders/${id}`);
+    return response.data;
+  },
+  downloadInvoice: async id => {
+    const response = await api.get(`/api/orders/${id}/invoice`, {
+      responseType: "blob",
+    });
     return response.data;
   },
   sendConfirmation: async (email, orderId, orderDetails) => {
@@ -71,13 +77,29 @@ export const orderService = {
   },
 };
 
+// Delivery Tracking Service
+export const deliveryService = {
+  assignDriver: async orderId => {
+    const response = await api.post(`/api/orders/${orderId}/delivery/assign`);
+    return response.data;
+  },
+  getTracking: async orderId => {
+    const response = await api.get(`/api/orders/${orderId}/delivery/tracking`);
+    return response.data;
+  },
+  updateStatus: async orderId => {
+    const response = await api.get(`/api/orders/${orderId}/delivery/update`);
+    return response.data;
+  },
+};
+
 // Contact Service
 export const contactService = {
-  sendEmail: async (formData) => {
+  sendEmail: async formData => {
     const response = await api.post("/send-email", formData);
     return response.data;
   },
-  submitFranchise: async (formData) => {
+  submitFranchise: async formData => {
     const response = await api.post("/api/franchise-apply", formData);
     return response.data;
   },
@@ -103,18 +125,18 @@ export const menuService = {
     if (useCache && isCacheValid() && menuCache.items) {
       return menuCache.items;
     }
-    
+
     const response = await api.get("/api/menu");
-    
+
     // Update cache
     if (useCache) {
       menuCache.items = response.data;
       menuCache.timestamp = Date.now();
     }
-    
+
     return response.data;
   },
-  getMenuItemById: async (id) => {
+  getMenuItemById: async id => {
     const response = await api.get(`/api/menu/${id}`);
     return response.data;
   },
@@ -123,15 +145,15 @@ export const menuService = {
     if (useCache && isCacheValid() && menuCache.categories) {
       return menuCache.categories;
     }
-    
+
     const response = await api.get("/api/categories");
-    
+
     // Update cache
     if (useCache) {
       menuCache.categories = response.data;
       menuCache.timestamp = Date.now();
     }
-    
+
     return response.data;
   },
   // Clear cache (useful after admin updates)
@@ -149,31 +171,31 @@ export const adminService = {
     const response = await api.get("/api/admin/dashboard/stats");
     return response.data;
   },
-  
+
   // Users
   getAllUsers: async () => {
     const response = await api.get("/api/admin/users");
     return response.data;
   },
-  getUserById: async (id) => {
+  getUserById: async id => {
     const response = await api.get(`/api/admin/users/${id}`);
     return response.data;
   },
-  toggleUserStatus: async (id) => {
+  toggleUserStatus: async id => {
     const response = await api.patch(`/api/admin/users/${id}/toggle-status`);
     return response.data;
   },
-  
+
   // Menu
   getAllMenuItems: async () => {
     const response = await api.get("/api/admin/menu");
     return response.data;
   },
-  getMenuItemById: async (id) => {
+  getMenuItemById: async id => {
     const response = await api.get(`/api/admin/menu/${id}`);
     return response.data;
   },
-  createMenuItem: async (formData) => {
+  createMenuItem: async formData => {
     const response = await api.post("/api/admin/menu", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -189,38 +211,42 @@ export const adminService = {
     });
     return response.data;
   },
-  deleteMenuItem: async (id) => {
+  deleteMenuItem: async id => {
     const response = await api.delete(`/api/admin/menu/${id}`);
     return response.data;
   },
-  
+
   // Orders
-  getAllOrders: async (status) => {
-    const url = status ? `/api/admin/orders?status=${status}` : "/api/admin/orders";
+  getAllOrders: async status => {
+    const url = status
+      ? `/api/admin/orders?status=${status}`
+      : "/api/admin/orders";
     const response = await api.get(url);
     return response.data;
   },
-  getOrderById: async (id) => {
+  getOrderById: async id => {
     const response = await api.get(`/api/admin/orders/${id}`);
     return response.data;
   },
   updateOrderStatus: async (id, status) => {
-    const response = await api.patch(`/api/admin/orders/${id}/status`, { status });
+    const response = await api.patch(`/api/admin/orders/${id}/status`, {
+      status,
+    });
     return response.data;
   },
-  
+
   // Analytics
   getAnalytics: async () => {
     const response = await api.get("/api/admin/analytics");
     return response.data;
   },
-  
+
   // Categories
   getAllCategories: async () => {
     const response = await api.get("/api/admin/categories");
     return response.data;
   },
-  createCategory: async (categoryData) => {
+  createCategory: async categoryData => {
     const response = await api.post("/api/admin/categories", categoryData);
     return response.data;
   },
@@ -228,17 +254,17 @@ export const adminService = {
     const response = await api.put(`/api/admin/categories/${id}`, categoryData);
     return response.data;
   },
-  deleteCategory: async (id) => {
+  deleteCategory: async id => {
     const response = await api.delete(`/api/admin/categories/${id}`);
     return response.data;
   },
-  
+
   // Promo Codes
   getAllPromoCodes: async () => {
     const response = await api.get("/api/admin/promo-codes");
     return response.data;
   },
-  createPromoCode: async (promoData) => {
+  createPromoCode: async promoData => {
     const response = await api.post("/api/admin/promo-codes", promoData);
     return response.data;
   },
@@ -246,37 +272,45 @@ export const adminService = {
     const response = await api.put(`/api/admin/promo-codes/${id}`, promoData);
     return response.data;
   },
-  deletePromoCode: async (id) => {
+  deletePromoCode: async id => {
     const response = await api.delete(`/api/admin/promo-codes/${id}`);
     return response.data;
   },
-  
+
   // Feedback
-  getAllFeedback: async (status) => {
-    const url = status ? `/api/admin/feedback?status=${status}` : "/api/admin/feedback";
+  getAllFeedback: async status => {
+    const url = status
+      ? `/api/admin/feedback?status=${status}`
+      : "/api/admin/feedback";
     const response = await api.get(url);
     return response.data;
   },
-  getFeedbackById: async (id) => {
+  getFeedbackById: async id => {
     const response = await api.get(`/api/admin/feedback/${id}`);
     return response.data;
   },
   updateFeedbackStatus: async (id, status) => {
-    const response = await api.patch(`/api/admin/feedback/${id}/status`, { status });
+    const response = await api.patch(`/api/admin/feedback/${id}/status`, {
+      status,
+    });
     return response.data;
   },
   replyToFeedback: async (id, message) => {
-    const response = await api.post(`/api/admin/feedback/${id}/reply`, { message });
+    const response = await api.post(`/api/admin/feedback/${id}/reply`, {
+      message,
+    });
     return response.data;
   },
-  deleteFeedback: async (id) => {
+  deleteFeedback: async id => {
     const response = await api.delete(`/api/admin/feedback/${id}`);
     return response.data;
   },
-  
+
   // Notifications
-  getAllNotifications: async (unread) => {
-    const url = unread ? `/api/admin/notifications?unread=true` : "/api/admin/notifications";
+  getAllNotifications: async unread => {
+    const url = unread
+      ? `/api/admin/notifications?unread=true`
+      : "/api/admin/notifications";
     const response = await api.get(url);
     return response.data;
   },
@@ -291,4 +325,3 @@ export const feedbackService = {
 };
 
 export default api;
-

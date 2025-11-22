@@ -51,7 +51,7 @@ const MenuManagement = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     try {
       const formDataToSend = new FormData();
@@ -61,7 +61,7 @@ const MenuManagement = () => {
       formDataToSend.append("category", formData.category);
       formDataToSend.append("available", formData.available);
       formDataToSend.append("popular", formData.popular);
-      
+
       if (imageFile) {
         formDataToSend.append("image", imageFile);
       } else if (formData.image) {
@@ -82,7 +82,7 @@ const MenuManagement = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async id => {
     if (window.confirm("Are you sure you want to delete this item?")) {
       try {
         await adminService.deleteMenuItem(id);
@@ -94,7 +94,7 @@ const MenuManagement = () => {
     }
   };
 
-  const handleEdit = (item) => {
+  const handleEdit = item => {
     setEditingItem(item);
     setFormData({
       name: item.name,
@@ -139,12 +139,16 @@ const MenuManagement = () => {
       </div>
 
       <div className="menu-grid">
-        {menuItems.map((item) => (
+        {menuItems.map(item => (
           <div key={item._id} className="menu-item-card">
             <div className="menu-item-image">
               {item.image ? (
                 <img
-                  src={item.image.startsWith("http") ? item.image : `${API_URL}${item.image}`}
+                  src={
+                    item.image.startsWith("http")
+                      ? item.image
+                      : `${API_URL}${item.image}`
+                  }
                   alt={item.name}
                 />
               ) : (
@@ -154,7 +158,9 @@ const MenuManagement = () => {
               )}
               <div className="item-badges">
                 {item.popular && <span className="badge popular">Popular</span>}
-                {!item.available && <span className="badge unavailable">Out of Stock</span>}
+                {!item.available && (
+                  <span className="badge unavailable">Out of Stock</span>
+                )}
               </div>
             </div>
             <div className="menu-item-content">
@@ -165,10 +171,7 @@ const MenuManagement = () => {
                 <span className="item-price">${item.price}</span>
               </div>
               <div className="item-actions">
-                <button
-                  className="btn-edit"
-                  onClick={() => handleEdit(item)}
-                >
+                <button className="btn-edit" onClick={() => handleEdit(item)}>
                   <FaEdit /> Edit
                 </button>
                 <button
@@ -185,7 +188,7 @@ const MenuManagement = () => {
 
       {showModal && (
         <div className="modal-overlay" onClick={resetForm}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h3>{editingItem ? "Edit Menu Item" : "Add New Menu Item"}</h3>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
@@ -193,7 +196,7 @@ const MenuManagement = () => {
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) =>
+                  onChange={e =>
                     setFormData({ ...formData, name: e.target.value })
                   }
                   required
@@ -204,7 +207,7 @@ const MenuManagement = () => {
                 <label>Description *</label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) =>
+                  onChange={e =>
                     setFormData({ ...formData, description: e.target.value })
                   }
                   required
@@ -219,7 +222,7 @@ const MenuManagement = () => {
                     type="number"
                     step="0.01"
                     value={formData.price}
-                    onChange={(e) =>
+                    onChange={e =>
                       setFormData({ ...formData, price: e.target.value })
                     }
                     required
@@ -230,12 +233,12 @@ const MenuManagement = () => {
                   <label>Category *</label>
                   <select
                     value={formData.category}
-                    onChange={(e) =>
+                    onChange={e =>
                       setFormData({ ...formData, category: e.target.value })
                     }
                     required
                   >
-                    {categories.map((cat) => (
+                    {categories.map(cat => (
                       <option key={cat} value={cat}>
                         {cat}
                       </option>
@@ -249,14 +252,14 @@ const MenuManagement = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setImageFile(e.target.files[0])}
+                  onChange={e => setImageFile(e.target.files[0])}
                 />
                 {!imageFile && formData.image && (
                   <input
                     type="text"
                     placeholder="Or enter image URL"
                     value={formData.image}
-                    onChange={(e) =>
+                    onChange={e =>
                       setFormData({ ...formData, image: e.target.value })
                     }
                   />
@@ -268,7 +271,7 @@ const MenuManagement = () => {
                   <input
                     type="checkbox"
                     checked={formData.available}
-                    onChange={(e) =>
+                    onChange={e =>
                       setFormData({ ...formData, available: e.target.checked })
                     }
                   />
@@ -279,7 +282,7 @@ const MenuManagement = () => {
                   <input
                     type="checkbox"
                     checked={formData.popular}
-                    onChange={(e) =>
+                    onChange={e =>
                       setFormData({ ...formData, popular: e.target.checked })
                     }
                   />
@@ -288,7 +291,11 @@ const MenuManagement = () => {
               </div>
 
               <div className="modal-actions">
-                <button type="button" className="btn-secondary" onClick={resetForm}>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={resetForm}
+                >
                   Cancel
                 </button>
                 <button type="submit" className="btn-primary">
@@ -304,4 +311,3 @@ const MenuManagement = () => {
 };
 
 export default MenuManagement;
-

@@ -20,6 +20,44 @@
 .filter-group {
   display: flex;
   gap: 10px;
+  align-items: center;
+}
+
+.live-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.live-status-indicator .spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  }
+  50% {
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+  }
 }
 
 .status-filter {
@@ -96,6 +134,74 @@
 .info-item strong {
   color: #333;
   margin-right: 5px;
+}
+
+.delivery-partner-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f0f9ff;
+  border-radius: 8px;
+  border-left: 3px solid #ff6b35;
+}
+
+.delivery-partner-info svg {
+  color: #ff6b35;
+}
+
+.partner-details {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.vehicle-badge {
+  padding: 0.25rem 0.75rem;
+  background: #e0f2fe;
+  color: #0369a1;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.partner-status {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.assign-partner-section {
+  flex: 1;
+}
+
+.partner-select {
+  width: 100%;
+  padding: 10px 16px;
+  border: 2px solid #ff6b35;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background: white;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.partner-select:hover {
+  border-color: #e55a2b;
+}
+
+.partner-select:focus {
+  outline: none;
+  border-color: #e55a2b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+.partner-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .order-actions {

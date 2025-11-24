@@ -117,7 +117,23 @@ const Login = () => {
                 </div>
               </div>
               <div className="form-group">
-                <label htmlFor="password">Password</label>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                  <label htmlFor="password" style={{ marginBottom: 0 }}>Password</label>
+                  <Link
+                    to="/forgot-password"
+                    style={{
+                      color: "#4f46e5",
+                      textDecoration: "none",
+                      fontSize: "0.875rem",
+                      fontWeight: "500",
+                      transition: "color 0.2s",
+                    }}
+                    onMouseEnter={(e) => e.target.style.color = "#4338ca"}
+                    onMouseLeave={(e) => e.target.style.color = "#4f46e5"}
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <div className="input-wrapper">
                   <span className="input-icon">🔒</span>
                   <input

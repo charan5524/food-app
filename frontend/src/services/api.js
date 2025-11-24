@@ -45,6 +45,14 @@ export const authService = {
     const response = await api.post("/api/auth/register", userData);
     return response.data;
   },
+  forgotPassword: async email => {
+    const response = await api.post("/api/auth/forgot-password", { email });
+    return response.data;
+  },
+  resetPassword: async (token, password) => {
+    const response = await api.post("/api/auth/reset-password", { token, password });
+    return response.data;
+  },
 };
 
 // Order Service
@@ -59,6 +67,10 @@ export const orderService = {
   },
   getById: async id => {
     const response = await api.get(`/api/orders/${id}`);
+    return response.data;
+  },
+  getStatus: async id => {
+    const response = await api.get(`/api/orders/${id}/status`);
     return response.data;
   },
   downloadInvoice: async id => {
@@ -312,6 +324,34 @@ export const adminService = {
       ? `/api/admin/notifications?unread=true`
       : "/api/admin/notifications";
     const response = await api.get(url);
+    return response.data;
+  },
+
+  // Delivery Partners
+  getAllDeliveryPartners: async () => {
+    const response = await api.get("/api/admin/delivery-partners");
+    return response.data;
+  },
+  getFreeDeliveryPartners: async () => {
+    const response = await api.get("/api/admin/delivery-partners/free");
+    return response.data;
+  },
+  createDeliveryPartner: async partnerData => {
+    const response = await api.post("/api/admin/delivery-partners", partnerData);
+    return response.data;
+  },
+  updateDeliveryPartnerStatus: async (id, status) => {
+    const response = await api.patch(`/api/admin/delivery-partners/${id}/status`, { status });
+    return response.data;
+  },
+  deleteDeliveryPartner: async id => {
+    const response = await api.delete(`/api/admin/delivery-partners/${id}`);
+    return response.data;
+  },
+  assignDeliveryPartner: async (orderId, deliveryPartnerId) => {
+    const response = await api.post(`/api/admin/orders/${orderId}/assign-delivery`, {
+      deliveryPartnerId,
+    });
     return response.data;
   },
 };

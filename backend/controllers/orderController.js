@@ -1,5 +1,9 @@
 const Order = require("../models/Order");
 const PDFDocument = require("pdfkit");
+const { assignNextDriver } = require("../utils/deliveryAssignment");
+const {
+  startOrderStatusAutomation,
+} = require("../utils/orderStatusAutomation");
 
 // Create a new order
 exports.createOrder = async (req, res) => {
@@ -85,85 +89,27 @@ exports.createOrder = async (req, res) => {
 
     const savedOrder = await order.save();
 
-    // Auto-assign driver if order has delivery address
-    if (savedOrder.customerDetails?.address) {
-      try {
-        const deliveryController = require("./deliveryController");
-        // Import fake drivers and restaurant location
-        const FAKE_DRIVERS = [
-          {
-            name: "Ravi Kumar",
-            phone: "+91 9876543210",
-            vehicle: "AP 09 CD 1234",
-          },
-          {
-            name: "Suresh Reddy",
-            phone: "+91 9876543211",
-            vehicle: "TS 10 AB 5678",
-          },
-          {
-            name: "Kiran Patel",
-            phone: "+91 9876543212",
-            vehicle: "GJ 11 XY 9012",
-          },
-          {
-            name: "Amit Sharma",
-            phone: "+91 9876543213",
-            vehicle: "DL 12 MN 3456",
-          },
-          {
-            name: "Rajesh Singh",
-            phone: "+91 9876543214",
-            vehicle: "UP 13 PQ 7890",
-          },
-        ];
-        const RESTAURANT_LOCATION = {
-          lat: 17.385,
-          lng: 78.4867,
-        };
-
-        // Check if driver already assigned
-        if (!savedOrder.delivery?.driver?.name) {
-          const randomDriver =
-            FAKE_DRIVERS[Math.floor(Math.random() * FAKE_DRIVERS.length)];
-          const customerLocation = {
-            lat: RESTAURANT_LOCATION.lat + (Math.random() * 0.1 - 0.05),
-            lng: RESTAURANT_LOCATION.lng + (Math.random() * 0.1 - 0.05),
-          };
-          const estimatedArrival = new Date();
-          estimatedArrival.setMinutes(
-            estimatedArrival.getMinutes() + 5 + Math.floor(Math.random() * 5)
-          );
-
-          savedOrder.delivery = {
-            driver: {
-              name: randomDriver.name,
-              phone: randomDriver.phone,
-              vehicleNumber: randomDriver.vehicle,
-              vehicleType: "Bike",
-            },
-            status: "searching",
-            currentLocation: {
-              lat: RESTAURANT_LOCATION.lat + 0.02,
-              lng: RESTAURANT_LOCATION.lng + 0.02,
-            },
-            restaurantLocation: RESTAURANT_LOCATION,
-            customerLocation: customerLocation,
-            estimatedArrival: estimatedArrival,
-            statusHistory: [
-              {
-                status: "searching",
-                timestamp: new Date(),
-                message: "Searching for a driver nearby...",
-              },
-            ],
-          };
-          await savedOrder.save();
-        }
-      } catch (deliveryError) {
-        console.error("Error auto-assigning driver:", deliveryError);
-        // Don't fail order creation if driver assignment fails
+    // Automatically assign delivery partner when order is created
+    let assignedDriver = null;
+    try {
+      assignedDriver = await assignNextDriver(savedOrder);
+      if (assignedDriver) {
+        // Reload order to get populated delivery partner
+        await savedOrder.populate(
+          "deliveryPartnerId",
+          "name phone vehicleType vehicleNumber status"
+        );
+        console.log(
+          `✅ Driver ${assignedDriver.name} automatically assigned to new order ${savedOrder._id}`
+        );
+      } else {
+        console.log(
+          `⚠️  No delivery partners available for order ${savedOrder._id}`
+        );
       }
+    } catch (deliveryError) {
+      console.error("Error auto-assigning driver:", deliveryError);
+      // Don't fail order creation if driver assignment fails
     }
 
     // Create notification for admin
@@ -187,10 +133,42 @@ exports.createOrder = async (req, res) => {
       // Don't fail order creation if notification fails
     }
 
+    // Reload order with populated delivery partner if assigned
+    if (assignedDriver) {
+      await savedOrder.populate(
+        "deliveryPartnerId",
+        "name phone vehicleType vehicleNumber status"
+      );
+    }
+
+    // Start automated order status flow for immediate orders
+    if (!isScheduled && orderType === "immediate") {
+      try {
+        // Start automation in background (don't await to avoid blocking response)
+        startOrderStatusAutomation(savedOrder._id.toString()).catch((err) => {
+          console.error(
+            `Error starting automation for order ${savedOrder._id}:`,
+            err
+          );
+        });
+      } catch (automationError) {
+        console.error("Error starting order automation:", automationError);
+        // Don't fail order creation if automation fails
+      }
+    }
+
     res.status(201).json({
       success: true,
       orderId: savedOrder._id,
       order: savedOrder,
+      driverAssigned: assignedDriver
+        ? {
+            name: assignedDriver.name,
+            phone: assignedDriver.phone,
+            vehicleType: assignedDriver.vehicleType,
+            vehicleNumber: assignedDriver.vehicleNumber,
+          }
+        : null,
     });
   } catch (error) {
     console.error("Error creating order:", error);
@@ -206,6 +184,7 @@ exports.createOrder = async (req, res) => {
 exports.getUserOrders = async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.user.id })
+      .populate("deliveryPartnerId", "name phone vehicleType vehicleNumber")
       .sort({ createdAt: -1 })
       .select("-__v");
 
@@ -229,7 +208,9 @@ exports.getOrderById = async (req, res) => {
     const order = await Order.findOne({
       _id: req.params.id,
       userId: req.user.id,
-    }).select("-__v");
+    })
+      .populate("deliveryPartnerId", "name phone vehicleType vehicleNumber")
+      .select("-__v");
 
     if (!order) {
       return res.status(404).json({
@@ -247,6 +228,40 @@ exports.getOrderById = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error fetching order",
+    });
+  }
+};
+
+// Get real-time order status (for polling)
+exports.getOrderStatus = async (req, res) => {
+  try {
+    const order = await Order.findOne({
+      _id: req.params.id,
+      userId: req.user.id,
+    })
+      .populate("deliveryPartnerId", "name phone vehicleType vehicleNumber")
+      .select("status statusTimestamps delivery createdAt");
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      status: order.status,
+      deliveryStatus: order.delivery?.status || null,
+      statusTimestamps: order.statusTimestamps || {},
+      delivery: order.delivery || null,
+      createdAt: order.createdAt,
+    });
+  } catch (error) {
+    console.error("Error fetching order status:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching order status",
     });
   }
 };

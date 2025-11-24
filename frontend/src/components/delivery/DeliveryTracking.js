@@ -475,22 +475,29 @@ const DeliveryTracking = ({ orderId, orderStatus }) => {
       }`}
     >
       <div className="delivery-header">
-        <h3>
-          <FaMotorcycle /> Live Delivery Tracking
-        </h3>
+        <div>
+          <h3>
+            <FaMotorcycle /> Live Delivery Tracking
+          </h3>
+          {delivery.status !== "delivered" && estimatedMinutes !== null && (
+            <p className="estimated-text">
+              Estimated arrival in {estimatedMinutes} minutes
+            </p>
+          )}
+          {delivery.status === "delivered" && (
+            <p className="delivered-text">
+              <FaCheckCircle /> Order delivered successfully!
+            </p>
+          )}
+        </div>
         {delivery.status !== "delivered" && estimatedMinutes !== null && (
           <div className="estimated-time">
             <FaClock /> {estimatedMinutes} min
           </div>
         )}
         {delivery.status === "delivered" && (
-          <div
-            className="estimated-time"
-            style={{
-              background: "linear-gradient(135deg, #4caf50 0%, #45a049 100%)",
-            }}
-          >
-            <FaCheckCircle /> Delivered!
+          <div className="estimated-time delivered-badge">
+            <FaCheckCircle /> Delivered
           </div>
         )}
       </div>
@@ -508,102 +515,6 @@ const DeliveryTracking = ({ orderId, orderStatus }) => {
           ></div>
         </div>
       </div>
-
-      {/* Driver Info Card */}
-      {delivery.driver && (
-        <div className="driver-info-card">
-          <div className="driver-avatar">
-            <FaMotorcycle />
-          </div>
-          <div className="driver-details">
-            <h4>{delivery.driver.name}</h4>
-            <p>
-              <FaMotorcycle /> {delivery.driver.vehicleNumber}
-            </p>
-            <a href={`tel:${delivery.driver.phone}`} className="call-driver">
-              <FaPhone /> Call Driver
-            </a>
-          </div>
-        </div>
-      )}
-
-      {/* Status Timeline */}
-      <div className="delivery-timeline">
-        {Object.entries(statusLabels).map(([status, label], index) => {
-          const isCompleted = index < currentStatusIndex;
-          const isCurrent = index === currentStatusIndex;
-          const isUpcoming = index > currentStatusIndex;
-
-          return (
-            <div
-              key={status}
-              className={`timeline-step ${isCompleted ? "completed" : ""} ${
-                isCurrent ? "current" : ""
-              } ${isUpcoming ? "upcoming" : ""}`}
-            >
-              <div className="timeline-icon">{statusIcons[status]}</div>
-              <div className="timeline-content">
-                <h4>{label}</h4>
-                {isCurrent && delivery.statusHistory && (
-                  <p className="status-message">
-                    {
-                      delivery.statusHistory[delivery.statusHistory.length - 1]
-                        ?.message
-                    }
-                  </p>
-                )}
-                {isCompleted && delivery.statusHistory && (
-                  <p className="status-time">
-                    {new Date(
-                      delivery.statusHistory.find(
-                        h => h.status === status
-                      )?.timestamp
-                    ).toLocaleTimeString()}
-                  </p>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Map */}
-      {delivery.currentLocation && (
-        <div className="delivery-map-container">
-          <div ref={mapRef} className="delivery-map"></div>
-          {!mapLoaded && (
-            <div className="map-loading">
-              <FaSpinner className="spinning" />
-              <p>Loading map...</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Status History */}
-      {delivery.statusHistory && delivery.statusHistory.length > 0 && (
-        <div className="status-history">
-          <h4>
-            <FaClock /> Status Updates
-          </h4>
-          <div className="history-list">
-            {delivery.statusHistory
-              .slice()
-              .reverse()
-              .map((history, index) => (
-                <div key={index} className="history-item">
-                  <div className="history-time">
-                    {new Date(history.timestamp).toLocaleTimeString("en-US", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </div>
-                  <div className="history-message">{history.message}</div>
-                </div>
-              ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

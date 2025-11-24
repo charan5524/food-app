@@ -9,6 +9,7 @@ const categoryController = require("../controllers/categoryController");
 const promoController = require("../controllers/promoController");
 const feedbackController = require("../controllers/feedbackController");
 const notificationController = require("../controllers/notificationController");
+const deliveryPartnerController = require("../controllers/deliveryPartnerController");
 
 // Dashboard statistics
 router.get("/dashboard/stats", adminAuth, adminController.getDashboardStats);
@@ -29,6 +30,7 @@ router.delete("/menu/:id", adminAuth, menuController.deleteMenuItem);
 router.get("/orders", adminAuth, adminOrderController.getAllOrders);
 router.get("/orders/:id", adminAuth, adminOrderController.getOrderById);
 router.patch("/orders/:id/status", adminAuth, adminOrderController.updateOrderStatus);
+router.post("/orders/:orderId/assign-delivery", adminAuth, deliveryPartnerController.assignDeliveryPartner);
 
 // Analytics routes
 router.get("/analytics", adminAuth, analyticsController.getAnalytics);
@@ -57,5 +59,12 @@ router.get("/notifications", adminAuth, notificationController.getAllNotificatio
 router.patch("/notifications/:id/read", adminAuth, notificationController.markAsRead);
 router.patch("/notifications/read-all", adminAuth, notificationController.markAllAsRead);
 router.delete("/notifications/:id", adminAuth, notificationController.deleteNotification);
+
+// Delivery Partner routes
+router.get("/delivery-partners", adminAuth, deliveryPartnerController.getAllDeliveryPartners);
+router.get("/delivery-partners/free", adminAuth, deliveryPartnerController.getFreeDeliveryPartners);
+router.post("/delivery-partners", adminAuth, deliveryPartnerController.createDeliveryPartner);
+router.patch("/delivery-partners/:id/status", adminAuth, deliveryPartnerController.updateDeliveryPartnerStatus);
+router.delete("/delivery-partners/:id", adminAuth, deliveryPartnerController.deleteDeliveryPartner);
 
 module.exports = router;

@@ -40,14 +40,29 @@ const orderSchema = new mongoose.Schema({
     type: String,
     enum: [
       "pending",
+      "received",
       "confirmed",
       "preparing",
+      "almost_ready",
       "ready",
       "processing",
       "completed",
       "cancelled",
     ],
     default: "pending",
+  },
+  statusTimestamps: {
+    received: Date,
+    preparing: Date,
+    almostReady: Date,
+    deliveryPartnerAssigned: Date,
+    enroute: Date,
+    delivered: Date,
+  },
+  deliveryPartnerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "DeliveryPartner",
+    default: null,
   },
   // Delivery Tracking Fields
   delivery: {

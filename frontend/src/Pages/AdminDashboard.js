@@ -14,6 +14,7 @@ import {
   FaComments,
   FaBell,
   FaFolder,
+  FaMotorcycle,
 } from "react-icons/fa";
 import "./AdminDashboard.css";
 import DashboardOverview from "../components/admin/DashboardOverview";
@@ -25,6 +26,7 @@ import CategoryManagement from "../components/admin/CategoryManagement";
 import PromoCodeManagement from "../components/admin/PromoCodeManagement";
 import FeedbackManagement from "../components/admin/FeedbackManagement";
 import NotificationsCenter from "../components/admin/NotificationsCenter";
+import DeliveryPartnerManagement from "../components/admin/DeliveryPartnerManagement";
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -83,6 +85,7 @@ const AdminDashboard = () => {
     { id: "menu", label: "Menu Items", icon: FaUtensils },
     { id: "categories", label: "Categories", icon: FaFolder },
     { id: "orders", label: "Orders", icon: FaShoppingBag },
+    { id: "delivery-partners", label: "Delivery Partners", icon: FaMotorcycle },
     { id: "promo-codes", label: "Promo Codes", icon: FaTags },
     { id: "users", label: "Users", icon: FaUsers },
     { id: "feedback", label: "Feedback", icon: FaComments },
@@ -106,6 +109,8 @@ const AdminDashboard = () => {
         return <CategoryManagement />;
       case "orders":
         return <OrderManagement />;
+      case "delivery-partners":
+        return <DeliveryPartnerManagement />;
       case "promo-codes":
         return <PromoCodeManagement />;
       case "users":

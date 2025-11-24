@@ -42,6 +42,14 @@ router.get(
 // Download invoice
 router.get("/:id/invoice", apiLimiter, auth, orderController.downloadInvoice);
 
+// Get real-time order status (for polling)
+router.get(
+  "/:id/status",
+  apiLimiter,
+  auth,
+  orderController.getOrderStatus
+);
+
 // Get a specific order (MUST be last to avoid catching delivery routes)
 router.get("/:id", apiLimiter, auth, orderController.getOrderById);
 

@@ -118,25 +118,32 @@ exports.updateOrderStatus = async (req, res) => {
       }
     }
 
-    // If order is completed or cancelled, free up the driver
+    // If order is completed or cancelled, free up the delivery partner
     if (
       (status === "completed" || status === "cancelled") &&
       order.deliveryPartnerId
     ) {
-      const partner = await DeliveryPartner.findById(order.deliveryPartnerId);
-      if (partner) {
-        // Check if partner has other active orders
-        const activeOrders = await Order.countDocuments({
-          deliveryPartnerId: partner._id,
-          status: { $in: ["ready", "processing"] },
-          _id: { $ne: order._id },
-        });
+      // Populate delivery partner if not already populated
+      if (typeof order.deliveryPartnerId === 'string' || order.deliveryPartnerId._id) {
+        const partnerId = order.deliveryPartnerId._id || order.deliveryPartnerId;
+        const partner = await DeliveryPartner.findById(partnerId);
+        
+        if (partner) {
+          // Check if partner has other active orders (not completed or cancelled)
+          const activeOrders = await Order.countDocuments({
+            deliveryPartnerId: partner._id,
+            status: { $nin: ["completed", "cancelled"] },
+            _id: { $ne: order._id },
+          });
 
-        // Only mark as free if no other active orders
-        if (activeOrders === 0 && partner.status === "busy") {
-          partner.status = "free";
-          await partner.save();
-          console.log(`✅ Freed up driver: ${partner.name}`);
+          // Only mark as free if no other active orders
+          if (activeOrders === 0) {
+            partner.status = "free";
+            await partner.save();
+            console.log(`✅ Freed up delivery partner: ${partner.name} (Order ${order._id} ${status})`);
+          } else {
+            console.log(`ℹ️  Delivery partner ${partner.name} still has ${activeOrders} active order(s)`);
+          }
         }
       }
     }

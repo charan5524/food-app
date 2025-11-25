@@ -353,10 +353,26 @@ const completeDelivery = async (orderId) => {
       };
     }
 
-    // Free up delivery partner
+    // Free up delivery partner when order is completed
     if (order.deliveryPartnerId) {
-      order.deliveryPartnerId.status = "free";
-      await order.deliveryPartnerId.save();
+      const partner = await DeliveryPartner.findById(order.deliveryPartnerId._id || order.deliveryPartnerId);
+      if (partner) {
+        // Check if partner has other active orders (not completed or cancelled)
+        const activeOrders = await Order.countDocuments({
+          deliveryPartnerId: partner._id,
+          status: { $nin: ["completed", "cancelled"] },
+          _id: { $ne: order._id },
+        });
+
+        // Only mark as free if no other active orders
+        if (activeOrders === 0) {
+          partner.status = "free";
+          await partner.save();
+          console.log(`✅ Freed up delivery partner: ${partner.name} (Order ${orderId} completed)`);
+        } else {
+          console.log(`ℹ️  Delivery partner ${partner.name} still has ${activeOrders} active order(s)`);
+        }
+      }
     }
 
     await order.save();

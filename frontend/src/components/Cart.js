@@ -218,7 +218,7 @@ const Cart = ({ cartItems, onRemoveItem, onUpdateQuantity, onClearCart }) => {
     );
   };
 
-  const DELIVERY_FEE = 40;
+  const DELIVERY_FEE = 5;
 
   const calculateDiscount = () => {
     if (!appliedPromo) return 0;

@@ -22,28 +22,34 @@ const menuItems = [
   // Biryani Section
   {
     name: "Chicken Biryani",
-    description: "Classic chicken biryani with tender chicken pieces and aromatic spices",
+    description:
+      "Classic chicken biryani with tender chicken pieces and aromatic spices",
     price: 16.99,
     category: "Biryani",
-    image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
   {
     name: "Hyderabadi Dum Biryani",
-    description: "Traditional Hyderabadi style biryani cooked in dum style with meat",
+    description:
+      "Traditional Hyderabadi style biryani cooked in dum style with meat",
     price: 18.99,
     category: "Biryani",
-    image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
   {
     name: "Veg Biryani",
-    description: "Aromatic basmati rice cooked with mixed vegetables and special spices",
+    description:
+      "Aromatic basmati rice cooked with mixed vegetables and special spices",
     price: 14.99,
     category: "Biryani",
-    image: "https://images.unsplash.com/photo-1631452180519-c014fe006bc0?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1631452181339-5b604e938f70?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
@@ -53,7 +59,8 @@ const menuItems = [
     description: "Tender chicken in rich tomato and butter gravy",
     price: 14.99,
     category: "Curries",
-    image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
@@ -62,7 +69,8 @@ const menuItems = [
     description: "Cottage cheese in rich tomato and butter gravy",
     price: 12.99,
     category: "Curries",
-    image: "https://images.unsplash.com/photo-1631452180519-c014fe006bc0?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1631452180519-c014fe006bc0?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
@@ -71,7 +79,8 @@ const menuItems = [
     description: "Black lentils cooked overnight with butter and cream",
     price: 10.99,
     category: "Curries",
-    image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
@@ -81,7 +90,8 @@ const menuItems = [
     description: "Tender chicken pieces marinated in spices and grilled",
     price: 10.99,
     category: "Appetizers",
-    image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
@@ -90,7 +100,8 @@ const menuItems = [
     description: "Grilled cottage cheese with spices and vegetables",
     price: 8.99,
     category: "Appetizers",
-    image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1609501676725-7186f3a1f0f9?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
@@ -99,7 +110,8 @@ const menuItems = [
     description: "Crispy pastry filled with spiced potatoes and peas",
     price: 4.99,
     category: "Appetizers",
-    image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
@@ -109,7 +121,8 @@ const menuItems = [
     description: "Soft bread brushed with butter",
     price: 3.99,
     category: "Breads",
-    image: "https://images.unsplash.com/photo-1608198093002-ad4e505484ba?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1608198093002-ad4e505484ba?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
@@ -118,7 +131,8 @@ const menuItems = [
     description: "Naan topped with garlic and butter",
     price: 4.99,
     category: "Breads",
-    image: "https://images.unsplash.com/photo-1608198093002-ad4e505484ba?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1609501676725-7186f3a1f0f9?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
@@ -128,7 +142,8 @@ const menuItems = [
     description: "Sweet milk-solid balls in sugar syrup",
     price: 5.99,
     category: "Desserts",
-    image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
@@ -137,7 +152,8 @@ const menuItems = [
     description: "Traditional Indian ice cream",
     price: 4.99,
     category: "Desserts",
-    image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
@@ -147,16 +163,19 @@ const menuItems = [
     description: "Traditional spiced Indian tea",
     price: 2.99,
     category: "Beverages",
-    image: "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
   {
     name: "Sweet Lassi",
-    description: "Sweet yogurt drink with cardamom",
+    description:
+      "Creamy sweet yogurt drink topped with chopped pistachios and dried rose petals, garnished with aromatic cardamom",
     price: 3.99,
     category: "Beverages",
-    image: "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=800&h=600&fit=crop",
     popular: true,
     available: true,
   },
@@ -186,8 +205,10 @@ const seedCategories = async () => {
     let updated = 0;
 
     for (const categoryData of menuCategories) {
-      const existingCategory = await Category.findOne({ name: categoryData.name });
-      
+      const existingCategory = await Category.findOne({
+        name: categoryData.name,
+      });
+
       if (existingCategory) {
         // Update existing category
         existingCategory.icon = categoryData.icon;
@@ -220,7 +241,7 @@ const seedMenuItems = async () => {
 
     for (const itemData of menuItems) {
       const existingItem = await MenuItem.findOne({ name: itemData.name });
-      
+
       if (existingItem) {
         // Update existing item
         existingItem.description = itemData.description;
@@ -253,12 +274,12 @@ const seedMenuItems = async () => {
 const seedDatabase = async () => {
   try {
     console.log("🚀 Starting database seeding...\n");
-    
+
     await connectDB();
-    
+
     const categoriesSuccess = await seedCategories();
     const menuItemsSuccess = await seedMenuItems();
-    
+
     if (categoriesSuccess && menuItemsSuccess) {
       console.log("\n✅ Database seeding completed successfully!");
       console.log("\n📊 Summary:");
@@ -267,7 +288,7 @@ const seedDatabase = async () => {
     } else {
       console.log("\n⚠️  Database seeding completed with errors");
     }
-    
+
     await mongoose.connection.close();
     console.log("\n✅ Database connection closed");
     process.exit(0);
@@ -284,4 +305,3 @@ if (require.main === module) {
 }
 
 module.exports = { seedDatabase, seedCategories, seedMenuItems };
-

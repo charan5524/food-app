@@ -284,44 +284,31 @@ const OrderDetails = ({ order: initialOrder, onBack }) => {
 
       {/* Order Summary - Show for completed orders */}
       {order.status === "completed" && (
-        <div className="order-summary-card">
-          <h3>
-            <FaCheckCircle /> Order Summary
-          </h3>
-          <div className="summary-content">
-            <div className="summary-item">
+        <div className="order-summary-container">
+          <div className="order-summary-header">
+            <div className="summary-icon-circle">
+              <FaCheckCircle />
+            </div>
+            <h2 className="order-summary-heading">Order Summary</h2>
+          </div>
+          <div className="order-summary-details-card">
+            <div className="summary-row">
               <span className="summary-label">Order ID</span>
-              <span className="summary-value">
-                #{order._id.slice(-8).toUpperCase()}
-              </span>
+              <span className="summary-value">#{order._id.slice(-8).toUpperCase()}</span>
             </div>
-            <div className="summary-item">
+            <div className="summary-row">
               <span className="summary-label">Order Date</span>
-              <span className="summary-value">
-                {formatDate(order.createdAt)}
-              </span>
+              <span className="summary-value">{formatDate(order.createdAt)}</span>
             </div>
-            {order.statusTimestamps?.delivered && (
-              <div className="summary-item">
-                <span className="summary-label">Delivered At</span>
-                <span className="summary-value">
-                  {new Date(order.statusTimestamps.delivered).toLocaleString()}
-                </span>
-              </div>
-            )}
             {order.deliveryPartnerId && (
-              <div className="summary-item">
+              <div className="summary-row">
                 <span className="summary-label">Delivered By</span>
-                <span className="summary-value">
-                  {order.deliveryPartnerId.name}
-                </span>
+                <span className="summary-value">{order.deliveryPartnerId.name}</span>
               </div>
             )}
-            <div className="summary-item">
+            <div className="summary-row summary-total">
               <span className="summary-label">Total Amount</span>
-              <span className="summary-value total-amount">
-                ₹{order.total?.toFixed(2)}
-              </span>
+              <span className="summary-value summary-amount">₹{order.total?.toFixed(2)}</span>
             </div>
           </div>
         </div>

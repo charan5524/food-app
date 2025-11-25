@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import PromoHighlights from "../components/PromoHighlights";
 import "./Home.css";
 
 const Home = () => {
@@ -47,22 +48,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Special Offers */}
-      <section className="special-offers">
-        <div className="offer-card">
-          <div className="offer-content">
-            <h2>Weekend Special</h2>
-            <p>Get 20% off on all biryanis</p>
-            <Link to="/menu" className="offer-button">
-              Order Now
-            </Link>
-          </div>
-          <img
-            src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800"
-            alt="Special Offer"
-          />
-        </div>
-      </section>
+      <PromoHighlights />
 
       {/* Why Choose Us */}
       <section className="why-choose-us">

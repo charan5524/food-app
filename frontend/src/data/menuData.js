@@ -19,7 +19,8 @@ export const menuItems = [
       "Classic chicken biryani with tender chicken pieces and aromatic spices",
     price: 16.99,
     category: "Biryani",
-    image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&h=600&fit=crop",
     popular: true,
   },
   {
@@ -29,7 +30,8 @@ export const menuItems = [
       "Traditional Hyderabadi style biryani cooked in dum style with meat",
     price: 18.99,
     category: "Biryani",
-    image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800&h=600&fit=crop",
     popular: true,
   },
   {
@@ -39,7 +41,8 @@ export const menuItems = [
       "Aromatic basmati rice cooked with mixed vegetables and special spices",
     price: 14.99,
     category: "Biryani",
-    image: "https://images.unsplash.com/photo-1631452180519-c014fe006bc0?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1631452180519-c014fe006bc0?w=800&h=600&fit=crop",
     popular: true,
   },
 
@@ -50,7 +53,8 @@ export const menuItems = [
     description: "Tender chicken in rich tomato and butter gravy",
     price: 14.99,
     category: "Curries",
-    image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800&h=600&fit=crop",
     popular: true,
   },
   {
@@ -59,7 +63,8 @@ export const menuItems = [
     description: "Cottage cheese in rich tomato and butter gravy",
     price: 12.99,
     category: "Curries",
-    image: "https://images.unsplash.com/photo-1631452180519-c014fe006bc0?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1631452180519-c014fe006bc0?w=800&h=600&fit=crop",
     popular: true,
   },
   {
@@ -68,7 +73,8 @@ export const menuItems = [
     description: "Black lentils cooked overnight with butter and cream",
     price: 10.99,
     category: "Curries",
-    image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800&h=600&fit=crop",
     popular: true,
   },
 
@@ -79,7 +85,8 @@ export const menuItems = [
     description: "Tender chicken pieces marinated in spices and grilled",
     price: 10.99,
     category: "Appetizers",
-    image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=800&h=600&fit=crop",
     popular: true,
   },
   {
@@ -88,7 +95,8 @@ export const menuItems = [
     description: "Grilled cottage cheese with spices and vegetables",
     price: 8.99,
     category: "Appetizers",
-    image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=800&h=600&fit=crop",
     popular: true,
   },
   {
@@ -97,7 +105,8 @@ export const menuItems = [
     description: "Crispy pastry filled with spiced potatoes and peas",
     price: 4.99,
     category: "Appetizers",
-    image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&h=600&fit=crop",
     popular: true,
   },
 
@@ -108,7 +117,8 @@ export const menuItems = [
     description: "Soft bread brushed with butter",
     price: 3.99,
     category: "Breads",
-    image: "https://images.unsplash.com/photo-1608198093002-ad4e505484ba?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1608198093002-ad4e505484ba?w=800&h=600&fit=crop",
     popular: true,
   },
   {
@@ -117,7 +127,8 @@ export const menuItems = [
     description: "Naan topped with garlic and butter",
     price: 4.99,
     category: "Breads",
-    image: "https://images.unsplash.com/photo-1608198093002-ad4e505484ba?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1608198093002-ad4e505484ba?w=800&h=600&fit=crop",
     popular: true,
   },
 
@@ -128,7 +139,8 @@ export const menuItems = [
     description: "Sweet milk-solid balls in sugar syrup",
     price: 5.99,
     category: "Desserts",
-    image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&h=600&fit=crop",
     popular: true,
   },
   {
@@ -137,7 +149,8 @@ export const menuItems = [
     description: "Traditional Indian ice cream",
     price: 4.99,
     category: "Desserts",
-    image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&h=600&fit=crop",
     popular: true,
   },
 
@@ -148,16 +161,19 @@ export const menuItems = [
     description: "Traditional spiced Indian tea",
     price: 2.99,
     category: "Beverages",
-    image: "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=800&h=600&fit=crop",
     popular: true,
   },
   {
     id: 15,
     name: "Sweet Lassi",
-    description: "Sweet yogurt drink with cardamom",
+    description:
+      "Creamy sweet yogurt drink topped with chopped pistachios and dried rose petals, garnished with aromatic cardamom",
     price: 3.99,
     category: "Beverages",
-    image: "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=800&h=600&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=800&h=600&fit=crop",
     popular: true,
   },
 ];

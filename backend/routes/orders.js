@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const orderController = require("../controllers/orderController");
 const deliveryController = require("../controllers/deliveryController");
+const promoController = require("../controllers/promoController");
+const paymentController = require("../controllers/paymentController");
 const auth = require("../middleware/auth");
 const { validateOrder } = require("../middleware/validation");
 const { apiLimiter } = require("../middleware/rateLimiter");
@@ -11,6 +13,23 @@ router.post("/", apiLimiter, auth, validateOrder, orderController.createOrder);
 
 // Get all orders for a user
 router.get("/", apiLimiter, auth, orderController.getUserOrders);
+
+// Validate promo code (public endpoint, no auth required)
+router.post("/validate-promo", apiLimiter, promoController.validatePromoCode);
+
+// Payment routes
+router.post(
+  "/create-payment-intent",
+  apiLimiter,
+  auth,
+  paymentController.createPaymentIntent
+);
+router.post(
+  "/confirm-payment",
+  apiLimiter,
+  auth,
+  paymentController.confirmPayment
+);
 
 // Send order confirmation email (must be before /:id routes)
 router.post(
@@ -43,12 +62,7 @@ router.get(
 router.get("/:id/invoice", apiLimiter, auth, orderController.downloadInvoice);
 
 // Get real-time order status (for polling)
-router.get(
-  "/:id/status",
-  apiLimiter,
-  auth,
-  orderController.getOrderStatus
-);
+router.get("/:id/status", apiLimiter, auth, orderController.getOrderStatus);
 
 // Get a specific order (MUST be last to avoid catching delivery routes)
 router.get("/:id", apiLimiter, auth, orderController.getOrderById);

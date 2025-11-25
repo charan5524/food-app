@@ -1,0 +1,142 @@
+.stripe-payment-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.payment-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.payment-amount {
+  text-align: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  color: white;
+}
+
+.payment-amount h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.amount-value {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.card-element-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card-element-container label {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.card-element-wrapper {
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  transition: border-color 0.3s;
+}
+
+.card-element-wrapper:focus-within {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.payment-error {
+  padding: 1rem;
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 8px;
+  color: #c33;
+  font-size: 0.9rem;
+}
+
+.payment-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.cancel-payment-btn,
+.submit-payment-btn {
+  flex: 1;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.cancel-payment-btn {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.cancel-payment-btn:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.submit-payment-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.submit-payment-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.cancel-payment-btn:disabled,
+.submit-payment-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Dark mode support */
+.dark .stripe-payment-container {
+  background: #2a2a2a;
+  color: #fff;
+}
+
+.dark .card-element-container label {
+  color: #fff;
+}
+
+.dark .card-element-wrapper {
+  background: #333;
+  border-color: #444;
+}
+
+.dark .cancel-payment-btn {
+  background: #444;
+  color: #fff;
+}
+
+.dark .cancel-payment-btn:hover:not(:disabled) {
+  background: #555;
+}

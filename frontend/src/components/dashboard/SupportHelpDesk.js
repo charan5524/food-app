@@ -1,7 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { FaTicketAlt, FaPlus, FaCheckCircle, FaClock, FaTimesCircle, FaReply, FaEnvelope } from "react-icons/fa";
+import {
+  FaTicketAlt,
+  FaPlus,
+  FaCheckCircle,
+  FaClock,
+  FaTimesCircle,
+  FaReply,
+  FaEnvelope,
+  FaClipboardList,
+  FaShippingFast,
+  FaCalendarCheck,
+  FaInfoCircle,
+  FaDollarSign,
+  FaBox,
+  FaCreditCard,
+  FaArrowRight,
+  FaShoppingBag,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { feedbackService } from "../../services/api";
+import { feedbackService, orderService } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import "./SupportHelpDesk.css";
 
@@ -12,14 +29,20 @@ const SupportHelpDesk = () => {
   const [loading, setLoading] = useState(true);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [error, setError] = useState(null);
+  const [orderSummary, setOrderSummary] = useState({
+    loading: true,
+    data: null,
+    error: null,
+  });
 
   useEffect(() => {
     if (user) {
-      console.log("👤 Current user:", user.email);
       fetchTickets();
+      fetchOrderSummary();
     } else {
       setError("Please log in to view your tickets");
       setLoading(false);
+      setOrderSummary((prev) => ({ ...prev, loading: false }));
     }
   }, [user]);
 
@@ -41,6 +64,59 @@ const SupportHelpDesk = () => {
       alert("Error loading tickets. Please make sure you're logged in and try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchOrderSummary = async () => {
+    try {
+      setOrderSummary((prev) => ({ ...prev, loading: true, error: null }));
+      const response = await orderService.getAll();
+      if (response.success) {
+        const orders = response.orders || [];
+        const totalOrders = orders.length;
+        const activeOrders = orders.filter((order) =>
+          ["pending", "processing"].includes(order.status)
+        );
+        const scheduledOrders = orders.filter(
+          (order) => order.isScheduled && order.scheduledDate
+        );
+        const lastOrder = orders
+          .slice()
+          .sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )[0];
+
+        setOrderSummary({
+          loading: false,
+          data: {
+            totalOrders,
+            activeOrders: activeOrders.length,
+            scheduledOrders: scheduledOrders.length,
+            lastOrder,
+            activeOrderList: activeOrders
+              .slice()
+              .sort(
+                (a, b) =>
+                  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+              )
+              .slice(0, 3),
+          },
+          error: null,
+        });
+      } else {
+        setOrderSummary({
+          loading: false,
+          data: null,
+          error: response.message || "Unable to load order summary.",
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching order summary:", err);
+      setOrderSummary({
+        loading: false,
+        data: null,
+        error: "Unable to load your order summary right now.",
+      });
     }
   };
 
@@ -69,11 +145,266 @@ const SupportHelpDesk = () => {
     return labels[status] || status;
   };
 
+  const formatOrderDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const formatCurrency = (amount) =>
+    typeof amount === "number" ? `₹${amount.toFixed(2)}` : "—";
+
+  const renderOrderSummary = () => {
+    if (orderSummary.loading) {
+      return (
+        <div className="order-summary-grid">
+          {[1, 2, 3].map((id) => (
+            <div key={id} className="order-summary-card skeleton">
+              <div className="skeleton-line w-50" />
+              <div className="skeleton-line w-30" />
+              <div className="skeleton-line w-80" />
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (orderSummary.error) {
+      return (
+        <div className="order-summary-error">
+          <FaInfoCircle />
+          <div>
+            <strong>Heads up</strong>
+            <p>{orderSummary.error}</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (!orderSummary.data || orderSummary.data.totalOrders === 0) {
+      return (
+        <div className="order-summary-empty">
+          <p>No orders yet. Your upcoming orders will appear here for quick reference.</p>
+        </div>
+      );
+    }
+
+    const { totalOrders, activeOrders, scheduledOrders, lastOrder } =
+      orderSummary.data;
+
+    return (
+      <>
+        <div className="order-summary-layout">
+          <div className="order-summary-main">
+            <div className="order-summary-grid">
+              <div className="order-summary-card">
+                <div className="card-icon blue">
+                  <FaClipboardList />
+                </div>
+                <div>
+                  <p>Total Orders</p>
+                  <h3>{totalOrders}</h3>
+                  <span>All completed + active orders</span>
+                </div>
+              </div>
+              <div className="order-summary-card">
+                <div className="card-icon green">
+                  <FaShippingFast />
+                </div>
+                <div>
+                  <p>Active Orders</p>
+                  <h3>{activeOrders}</h3>
+                  <span>Pending or in-progress</span>
+                </div>
+              </div>
+              <div className="order-summary-card">
+                <div className="card-icon purple">
+                  <FaCalendarCheck />
+                </div>
+                <div>
+                  <p>Scheduled</p>
+                  <h3>{scheduledOrders}</h3>
+                  <span>Upcoming deliveries</span>
+                </div>
+              </div>
+            </div>
+
+            {lastOrder && (
+              <div className="last-order-card">
+                <div className="last-order-header">
+                  <div className="last-order-title-section">
+                    <div className="order-icon-wrapper">
+                      <FaShoppingBag />
+                    </div>
+                    <div>
+                      <p className="last-order-label">Latest Order</p>
+                      <h3 className="last-order-id">#{lastOrder._id.slice(-8).toUpperCase()}</h3>
+                    </div>
+                  </div>
+                  <span className={`status-chip status-${lastOrder.status}`}>
+                    {getStatusLabel(lastOrder.status)}
+                  </span>
+                </div>
+                
+                <div className="last-order-meta">
+                  <div className="meta-item">
+                    <div className="meta-icon">
+                      <FaClock />
+                    </div>
+                    <div className="meta-content">
+                      <p className="meta-label">Placed on</p>
+                      <strong className="meta-value">{formatOrderDate(lastOrder.createdAt)}</strong>
+                    </div>
+                  </div>
+                  <div className="meta-item">
+                    <div className="meta-icon">
+                      <FaDollarSign />
+                    </div>
+                    <div className="meta-content">
+                      <p className="meta-label">Total Amount</p>
+                      <strong className="meta-value amount">{formatCurrency(lastOrder.total)}</strong>
+                    </div>
+                  </div>
+                  <div className="meta-item">
+                    <div className="meta-icon">
+                      <FaBox />
+                    </div>
+                    <div className="meta-content">
+                      <p className="meta-label">Items</p>
+                      <strong className="meta-value">{lastOrder.items?.length || 0} item(s)</strong>
+                    </div>
+                  </div>
+                  <div className="meta-item">
+                    <div className="meta-icon">
+                      <FaCreditCard />
+                    </div>
+                    <div className="meta-content">
+                      <p className="meta-label">Payment</p>
+                      <strong className="meta-value">{lastOrder.paymentMethod || "Cash on Delivery"}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {lastOrder.items && lastOrder.items.length > 0 && (
+                  <div className="order-items-preview">
+                    <p className="items-preview-label">Order Items:</p>
+                    <div className="items-list">
+                      {lastOrder.items.slice(0, 3).map((item, idx) => (
+                        <div key={idx} className="item-preview">
+                          <span className="item-name">{item.name}</span>
+                          <span className="item-qty">×{item.quantity}</span>
+                        </div>
+                      ))}
+                      {lastOrder.items.length > 3 && (
+                        <div className="item-preview more-items">
+                          +{lastOrder.items.length - 3} more items
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="order-hint">
+                  <FaInfoCircle className="hint-icon" />
+                  <span>
+                    Mention <strong>#{lastOrder._id.slice(-6).toUpperCase()}</strong> when
+                    raising a ticket for quicker support.
+                  </span>
+                </div>
+                <div className="order-actions-inline">
+                  <button
+                    className="outline-btn"
+                    onClick={() => navigate("/dashboard?section=orders")}
+                  >
+                    <FaClipboardList />
+                    View All Orders
+                  </button>
+                  <button className="primary-btn" onClick={() => navigate("/contact")}>
+                    Create Support Ticket
+                    <FaArrowRight />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="order-summary-side">
+            {renderActiveTimeline(orderSummary.data?.activeOrderList || [])}
+            <div className="support-tip-card">
+              <p className="tip-title">Need faster help?</p>
+              <ul>
+                <li>Reference your order ID when chatting with support.</li>
+                <li>Attach screenshots or delivery photos for quicker triage.</li>
+                <li>Use the “Raise Ticket” button to track replies.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  const renderActiveTimeline = (activeOrderList) => {
+    if (!activeOrderList || activeOrderList.length === 0) {
+      return (
+        <div className="active-timeline empty">
+          <p>No active orders right now.</p>
+          <span>New orders will appear here automatically.</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="active-timeline">
+        <div className="timeline-header">
+          <h4>Active Orders</h4>
+          <span>{activeOrderList.length} in progress</span>
+        </div>
+        <div className="timeline-list">
+          {activeOrderList.map((order) => (
+            <div key={order._id} className="timeline-item">
+              <div className="timeline-dot" />
+              <div className="timeline-content">
+                <div className="timeline-top">
+                  <strong>#{order._id.slice(-6).toUpperCase()}</strong>
+                  <span className={`status-chip status-${order.status}`}>
+                    {getStatusLabel(order.status)}
+                  </span>
+                </div>
+                <p>{formatOrderDate(order.createdAt)}</p>
+                <p className="timeline-amount">
+                  {order.items?.length || 0} items · {formatCurrency(order.total)}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="support-helpdesk">
       <div className="section-header">
         <h2>Support & Help Desk</h2>
         <p>Manage your support tickets and get help</p>
+      </div>
+
+      <div className="order-summary-section">
+        <div className="order-summary-header">
+          <div>
+            <h3>Your Order Snapshot</h3>
+            <p>We surface your recent orders here so support can assist faster.</p>
+          </div>
+          <button className="order-refresh-btn" onClick={fetchOrderSummary}>
+            Refresh
+          </button>
+        </div>
+        {renderOrderSummary()}
       </div>
 
       <div className="support-actions">

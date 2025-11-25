@@ -50,7 +50,10 @@ export const authService = {
     return response.data;
   },
   resetPassword: async (token, password) => {
-    const response = await api.post("/api/auth/reset-password", { token, password });
+    const response = await api.post("/api/auth/reset-password", {
+      token,
+      password,
+    });
     return response.data;
   },
 };
@@ -85,6 +88,35 @@ export const orderService = {
       orderId,
       orderDetails,
     });
+    return response.data;
+  },
+  validatePromoCode: async (code, orderAmount) => {
+    const response = await api.post("/api/orders/validate-promo", {
+      code,
+      orderAmount,
+    });
+    return response.data;
+  },
+  createPaymentIntent: async ({ amount, orderId }) => {
+    const response = await api.post("/api/orders/create-payment-intent", {
+      amount,
+      orderId,
+    });
+    return response.data;
+  },
+  confirmPayment: async ({ paymentIntentId, orderId }) => {
+    const response = await api.post("/api/orders/confirm-payment", {
+      paymentIntentId,
+      orderId,
+    });
+    return response.data;
+  },
+};
+
+// Promo Code Service (public)
+export const promoService = {
+  getActivePromoCodes: async () => {
+    const response = await api.get("/api/promo-codes/active");
     return response.data;
   },
 };
@@ -326,6 +358,18 @@ export const adminService = {
     const response = await api.get(url);
     return response.data;
   },
+  markNotificationAsRead: async id => {
+    const response = await api.patch(`/api/admin/notifications/${id}/read`);
+    return response.data;
+  },
+  markAllNotificationsAsRead: async () => {
+    const response = await api.patch(`/api/admin/notifications/read-all`);
+    return response.data;
+  },
+  deleteNotification: async id => {
+    const response = await api.delete(`/api/admin/notifications/${id}`);
+    return response.data;
+  },
 
   // Delivery Partners
   getAllDeliveryPartners: async () => {
@@ -337,11 +381,17 @@ export const adminService = {
     return response.data;
   },
   createDeliveryPartner: async partnerData => {
-    const response = await api.post("/api/admin/delivery-partners", partnerData);
+    const response = await api.post(
+      "/api/admin/delivery-partners",
+      partnerData
+    );
     return response.data;
   },
   updateDeliveryPartnerStatus: async (id, status) => {
-    const response = await api.patch(`/api/admin/delivery-partners/${id}/status`, { status });
+    const response = await api.patch(
+      `/api/admin/delivery-partners/${id}/status`,
+      { status }
+    );
     return response.data;
   },
   deleteDeliveryPartner: async id => {
@@ -349,9 +399,12 @@ export const adminService = {
     return response.data;
   },
   assignDeliveryPartner: async (orderId, deliveryPartnerId) => {
-    const response = await api.post(`/api/admin/orders/${orderId}/assign-delivery`, {
-      deliveryPartnerId,
-    });
+    const response = await api.post(
+      `/api/admin/orders/${orderId}/assign-delivery`,
+      {
+        deliveryPartnerId,
+      }
+    );
     return response.data;
   },
 };

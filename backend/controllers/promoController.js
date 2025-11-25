@@ -1,6 +1,6 @@
 const PromoCode = require("../models/PromoCode");
 
-// Get all promo codes
+// Get all promo codes (admin only)
 exports.getAllPromoCodes = async (req, res) => {
   try {
     const promoCodes = await PromoCode.find().sort({ createdAt: -1 });
@@ -17,11 +17,44 @@ exports.getAllPromoCodes = async (req, res) => {
   }
 };
 
+// Get active promo codes (public endpoint)
+exports.getActivePromoCodes = async (req, res) => {
+  try {
+    const now = new Date();
+    const promoCodes = await PromoCode.find({
+      active: true,
+      expiryDate: { $gt: now },
+    })
+      .select(
+        "code discountType discountValue expiryDate minOrderAmount usageLimit usedCount createdAt"
+      )
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      promoCodes,
+    });
+  } catch (error) {
+    console.error("Error fetching active promo codes:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching active promo codes",
+    });
+  }
+};
+
 // Create promo code
 exports.createPromoCode = async (req, res) => {
   try {
-    const { code, discountType, discountValue, expiryDate, usageLimit, minOrderAmount } = req.body;
-    
+    const {
+      code,
+      discountType,
+      discountValue,
+      expiryDate,
+      usageLimit,
+      minOrderAmount,
+    } = req.body;
+
     const promoCode = new PromoCode({
       code: code.toUpperCase(),
       discountType,
@@ -57,8 +90,16 @@ exports.createPromoCode = async (req, res) => {
 // Update promo code
 exports.updatePromoCode = async (req, res) => {
   try {
-    const { code, discountType, discountValue, expiryDate, usageLimit, minOrderAmount, active } = req.body;
-    
+    const {
+      code,
+      discountType,
+      discountValue,
+      expiryDate,
+      usageLimit,
+      minOrderAmount,
+      active,
+    } = req.body;
+
     const promoCode = await PromoCode.findById(req.params.id);
     if (!promoCode) {
       return res.status(404).json({
@@ -117,3 +158,88 @@ exports.deletePromoCode = async (req, res) => {
   }
 };
 
+// Validate promo code (public endpoint)
+exports.validatePromoCode = async (req, res) => {
+  try {
+    const { code, orderAmount } = req.body;
+
+    if (!code) {
+      return res.status(400).json({
+        success: false,
+        message: "Promo code is required",
+      });
+    }
+
+    const promoCode = await PromoCode.findOne({ code: code.toUpperCase() });
+
+    if (!promoCode) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid promo code",
+      });
+    }
+
+    // Check if promo code is active
+    if (!promoCode.active) {
+      return res.status(400).json({
+        success: false,
+        message: "This promo code is not active",
+      });
+    }
+
+    // Check if promo code has expired
+    if (new Date() > new Date(promoCode.expiryDate)) {
+      return res.status(400).json({
+        success: false,
+        message: "This promo code has expired",
+      });
+    }
+
+    // Check usage limit
+    if (promoCode.usageLimit && promoCode.usedCount >= promoCode.usageLimit) {
+      return res.status(400).json({
+        success: false,
+        message: "This promo code has reached its usage limit",
+      });
+    }
+
+    // Check minimum order amount
+    if (
+      orderAmount &&
+      promoCode.minOrderAmount > 0 &&
+      orderAmount < promoCode.minOrderAmount
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: `Minimum order amount of ₹${promoCode.minOrderAmount} is required for this promo code`,
+      });
+    }
+
+    // Calculate discount
+    let discountAmount = 0;
+    if (promoCode.discountType === "percentage") {
+      discountAmount = orderAmount
+        ? (orderAmount * promoCode.discountValue) / 100
+        : 0;
+    } else {
+      discountAmount = promoCode.discountValue;
+    }
+
+    res.json({
+      success: true,
+      promoCode: {
+        code: promoCode.code,
+        discountType: promoCode.discountType,
+        discountValue: promoCode.discountValue,
+        discountAmount: discountAmount,
+        minOrderAmount: promoCode.minOrderAmount,
+      },
+    });
+  } catch (error) {
+    console.error("Error validating promo code:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error validating promo code",
+    });
+  }
+};

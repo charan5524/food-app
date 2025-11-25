@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { adminService } from "../../services/api";
+import { adminService, menuService } from "../../services/api";
+import { useToast } from "../../context/ToastContext";
 import { FaPlus, FaEdit, FaTrash, FaImage } from "react-icons/fa";
 import "./MenuManagement.css";
 
@@ -18,12 +19,16 @@ const MenuManagement = () => {
     image: "",
   });
   const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { showToast } = useToast();
 
   const categories = [
     "Breakfast",
     "Lunch",
     "Dinner",
     "Drinks",
+    "Beverages",
     "Desserts",
     "Biryani",
     "Rice Dishes",
@@ -53,6 +58,7 @@ const MenuManagement = () => {
 
   const handleSubmit = async e => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("name", formData.name);
@@ -70,15 +76,28 @@ const MenuManagement = () => {
 
       if (editingItem) {
         await adminService.updateMenuItem(editingItem._id, formDataToSend);
+        showToast("Menu item updated successfully!", "success");
       } else {
         await adminService.createMenuItem(formDataToSend);
+        showToast("Menu item created successfully!", "success");
       }
 
+      // Clear menu cache to force refresh
+      menuService.clearCache();
+
       resetForm();
-      fetchMenuItems();
+      // Add a small delay to ensure backend processes the update
+      setTimeout(() => {
+        fetchMenuItems();
+      }, 500);
     } catch (error) {
       console.error("Error saving menu item:", error);
-      alert("Error saving menu item");
+      showToast(
+        error.response?.data?.message || "Error saving menu item",
+        "error"
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -105,6 +124,8 @@ const MenuManagement = () => {
       popular: item.popular,
       image: item.image,
     });
+    setImageFile(null);
+    setImagePreview(null);
     setShowModal(true);
   };
 
@@ -119,8 +140,22 @@ const MenuManagement = () => {
       image: "",
     });
     setImageFile(null);
+    setImagePreview(null);
     setEditingItem(null);
     setShowModal(false);
+  };
+
+  const handleImageChange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
@@ -146,12 +181,18 @@ const MenuManagement = () => {
                 <img
                   src={
                     item.image.startsWith("http")
-                      ? item.image
-                      : `${API_URL}${item.image}`
+                      ? `${item.image}?t=${Date.now()}`
+                      : `${API_URL}${item.image}?t=${Date.now()}`
                   }
                   alt={item.name}
+                  key={`${item._id}-${item.updatedAt || Date.now()}`}
+                  onError={e => {
+                    e.target.style.display = "none";
+                    e.target.nextSibling.style.display = "flex";
+                  }}
                 />
-              ) : (
+              ) : null}
+              {(!item.image || item.image === "") && (
                 <div className="no-image">
                   <FaImage />
                 </div>
@@ -252,17 +293,46 @@ const MenuManagement = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={e => setImageFile(e.target.files[0])}
+                  onChange={handleImageChange}
                 />
+                {imagePreview && (
+                  <div className="image-preview">
+                    <img src={imagePreview} alt="Preview" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageFile(null);
+                        setImagePreview(null);
+                      }}
+                      className="remove-preview-btn"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
                 {!imageFile && formData.image && (
-                  <input
-                    type="text"
-                    placeholder="Or enter image URL"
-                    value={formData.image}
-                    onChange={e =>
-                      setFormData({ ...formData, image: e.target.value })
-                    }
-                  />
+                  <div className="current-image">
+                    <p>Current Image:</p>
+                    <img
+                      src={
+                        formData.image.startsWith("http")
+                          ? formData.image
+                          : `${API_URL}${formData.image}`
+                      }
+                      alt="Current"
+                      onError={e => {
+                        e.target.style.display = "none";
+                      }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Or enter image URL"
+                      value={formData.image}
+                      onChange={e =>
+                        setFormData({ ...formData, image: e.target.value })
+                      }
+                    />
+                  </div>
                 )}
               </div>
 
@@ -298,8 +368,16 @@ const MenuManagement = () => {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary">
-                  {editingItem ? "Update" : "Create"}
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting
+                    ? "Saving..."
+                    : editingItem
+                    ? "Update"
+                    : "Create"}
                 </button>
               </div>
             </form>

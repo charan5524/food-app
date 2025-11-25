@@ -8,6 +8,7 @@ const path = require("path");
 const orderRoutes = require("./routes/orders");
 const authRoutes = require("./routes/auth");
 const contactController = require("./controllers/contactController");
+const paymentController = require("./controllers/paymentController");
 const {
   validateContact,
   validateFranchise,
@@ -29,6 +30,13 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
+
+// Stripe webhook (must be before body parser middleware for raw body)
+app.post(
+  "/api/webhooks/stripe",
+  express.raw({ type: "application/json" }),
+  paymentController.handleWebhook
+);
 
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
@@ -174,9 +182,15 @@ app.use("/api/orders", orderRoutes);
 // Public menu routes (no authentication required)
 const menuController = require("./controllers/menuController");
 const categoryController = require("./controllers/categoryController");
+const promoController = require("./controllers/promoController");
 app.get("/api/menu", menuController.getPublicMenuItems);
 app.get("/api/menu/:id", menuController.getMenuItemById);
 app.get("/api/categories", categoryController.getPublicCategories);
+app.get(
+  "/api/promo-codes/active",
+  apiLimiter,
+  promoController.getActivePromoCodes
+);
 
 // Admin routes
 const adminRoutes = require("./routes/admin");

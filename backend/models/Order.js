@@ -32,6 +32,14 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  discount: {
+    type: Number,
+    default: 0,
+  },
+  promoCode: {
+    type: String,
+    default: null,
+  },
   total: {
     type: Number,
     required: true,
@@ -123,6 +131,19 @@ const orderSchema = new mongoose.Schema({
     type: String,
     enum: ["immediate", "scheduled"],
     default: "immediate",
+  },
+  paymentStatus: {
+    type: String,
+    enum: ["pending", "paid", "failed", "refunded"],
+    default: "pending",
+  },
+  paymentIntentId: {
+    type: String,
+    default: null,
+  },
+  paymentMethod: {
+    type: String,
+    default: null,
   },
   createdAt: {
     type: Date,

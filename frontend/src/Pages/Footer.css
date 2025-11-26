@@ -1,160 +1,245 @@
-/* 🌟 Footer Styling */
+/* Footer Styling */
 .footer {
-  background: linear-gradient(to right, #111, #222);
-  color: white;
-  padding: 50px 0;
-  font-family: "Poppins", sans-serif;
+  background: #1a1a1a;
+  color: #ffffff;
+  padding: 4rem 2rem 2rem;
+  font-family: var(--font-primary);
+  margin-top: 4rem;
 }
 
 .footer-container {
-  max-width: 1200px;
-  margin: auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  text-align: center;
-  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 3rem;
+  margin-bottom: 3rem;
 }
 
-/* 🌟 Footer Sections */
-.footer-brand,
-.footer-links,
-.footer-contact,
-.footer-hours,
-.footer-social,
-.footer-newsletter {
-  flex: 1;
-  min-width: 220px;
+/* Footer Sections */
+.footer-brand {
+  grid-column: span 1;
 }
 
 .footer-brand h2 {
-  color: #ff5733;
-  font-size: 26px;
-  font-weight: bold;
+  color: #ff6b6b;
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  letter-spacing: -0.5px;
 }
 
 .footer-brand p {
-  font-size: 14px;
-  color: #aaa;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
 }
 
-/* 🌟 Quick Links */
 .footer-links h3,
 .footer-contact h3,
 .footer-hours h3,
 .footer-social h3,
 .footer-newsletter h3 {
-  color: #ff7849;
-  font-size: 18px;
-  margin-bottom: 15px;
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.3px;
 }
 
+/* Quick Links */
 .footer-links ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .footer-links ul li {
-  margin: 8px 0;
+  margin-bottom: 0.75rem;
 }
 
 .footer-links ul li a {
   text-decoration: none;
-  color: #ddd;
-  transition: 0.3s ease-in-out;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  display: inline-block;
+  position: relative;
+}
+
+.footer-links ul li a::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff6b6b, #ff8e53);
+  transition: width 0.3s ease;
 }
 
 .footer-links ul li a:hover {
-  color: #ff5733;
+  color: #ffffff;
+  transform: translateX(5px);
 }
 
-/* 🌟 Contact & Business Hours */
+.footer-links ul li a:hover::after {
+  width: 100%;
+}
+
+/* Contact & Business Hours */
 .footer-contact p,
 .footer-hours p {
-  font-size: 14px;
-  color: #ccc;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
 }
 
 .footer-icon {
-  color: #ff5733;
+  color: #ff6b6b;
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
-/* 🌟 Social Media Icons */
+/* Social Media Icons */
 .social-icons {
   display: flex;
-  justify-content: center;
-  gap: 15px;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .social-icons a {
-  color: #ddd;
-  font-size: 20px;
-  transition: 0.3s ease-in-out;
-}
-
-.social-icons a:hover {
-  color: #ff5733;
-  transform: scale(1.2);
-}
-
-/* 🌟 Newsletter Subscription */
-.newsletter-form {
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.social-icons a:hover {
+  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+  color: #ffffff;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+  border-color: transparent;
+}
+
+/* Newsletter Subscription */
+.newsletter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .newsletter-form input {
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  width: 200px;
-  font-size: 14px;
+  padding: 0.875rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.newsletter-form input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.newsletter-form input:focus {
+  outline: none;
+  border-color: #ff6b6b;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
 }
 
 .newsletter-form button {
-  background: #ff5733;
+  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
   color: white;
   border: none;
-  padding: 10px 15px;
-  font-size: 14px;
-  border-radius: 5px;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 10px;
   cursor: pointer;
-  transition: 0.3s ease-in-out;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
 }
 
 .newsletter-form button:hover {
-  background: #e63900;
-  transform: scale(1.05);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
 }
 
-/* 🌟 Copyright Section */
+.newsletter-form button:active {
+  transform: translateY(0);
+}
+
+/* Copyright Section */
 .footer-bottom {
   text-align: center;
-  padding-top: 20px;
-  font-size: 14px;
-  color: #aaa;
+  padding-top: 2rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
 }
 
-/* 🌟 Responsive Design */
-@media (max-width: 768px) {
+/* Responsive Design */
+@media (max-width: 968px) {
   .footer-container {
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
+  }
+
+  .footer-brand {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 3rem 1.5rem 1.5rem;
+  }
+
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .footer-brand {
+    grid-column: span 1;
   }
 
   .newsletter-form {
-    flex-direction: column;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    padding: 2.5rem 1rem 1rem;
   }
 
-  .newsletter-form input {
-    width: 100%;
+  .footer-brand h2 {
+    font-size: 1.5rem;
+  }
+
+  .footer-links h3,
+  .footer-contact h3,
+  .footer-hours h3,
+  .footer-social h3,
+  .footer-newsletter h3 {
+    font-size: 1.1rem;
   }
 }

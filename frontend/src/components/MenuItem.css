@@ -3,21 +3,21 @@
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .menu-item:hover {
   transform: translateY(-6px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  border-color: rgba(74, 144, 226, 0.2);
+  border-color: rgba(102, 126, 234, 0.2);
 }
 
 .menu-item-image {
   position: relative;
-  height: 220px;
+  height: 240px;
   overflow: hidden;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
@@ -26,7 +26,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.5s ease;
 }
 
 .menu-item:hover .menu-item-image img {
@@ -69,31 +69,10 @@
   gap: 4px;
   box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
   z-index: 2;
-  animation: pulse 2s ease-in-out infinite;
 }
 
 .badge-icon {
   font-size: 0.9rem;
-  animation: rotate 3s linear infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .menu-item-content {
@@ -147,7 +126,7 @@
 }
 
 .add-to-cart-btn {
-  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -155,10 +134,10 @@
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   min-width: 140px;
   display: flex;
   align-items: center;
@@ -184,19 +163,18 @@
 }
 
 .add-to-cart-btn:hover {
-  background: linear-gradient(135deg, #357abd 0%, #2a5f8f 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
 .add-to-cart-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .add-to-cart-btn:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
 }
 
 .add-to-cart-btn:disabled {
@@ -210,8 +188,8 @@
 }
 
 .add-to-cart-btn.added {
-  background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
   animation: successPulse 0.5s ease-out;
 }
 

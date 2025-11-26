@@ -148,6 +148,16 @@ const MenuManagement = () => {
   const handleImageChange = e => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        showToast("Image size must be less than 5MB", "error");
+        return;
+      }
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        showToast("Please select a valid image file", "error");
+        return;
+      }
       setImageFile(file);
       // Create preview
       const reader = new FileReader();
@@ -155,6 +165,31 @@ const MenuManagement = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDragOver = e => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith("image/")) {
+      if (file.size > 5 * 1024 * 1024) {
+        showToast("Image size must be less than 5MB", "error");
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      showToast("Please drop a valid image file", "error");
     }
   };
 
@@ -290,50 +325,93 @@ const MenuManagement = () => {
 
               <div className="form-group">
                 <label>Image</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-                {imagePreview && (
-                  <div className="image-preview">
-                    <img src={imagePreview} alt="Preview" />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setImageFile(null);
-                        setImagePreview(null);
-                      }}
-                      className="remove-preview-btn"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                )}
-                {!imageFile && formData.image && (
-                  <div className="current-image">
-                    <p>Current Image:</p>
-                    <img
-                      src={
-                        formData.image.startsWith("http")
-                          ? formData.image
-                          : `${API_URL}${formData.image}`
-                      }
-                      alt="Current"
-                      onError={e => {
-                        e.target.style.display = "none";
-                      }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Or enter image URL"
-                      value={formData.image}
-                      onChange={e =>
-                        setFormData({ ...formData, image: e.target.value })
-                      }
-                    />
-                  </div>
-                )}
+                <div
+                  className="image-upload-area"
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                >
+                  <input
+                    type="file"
+                    id="image-upload"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    style={{ display: "none" }}
+                  />
+                  {imagePreview ? (
+                    <div className="image-preview-container">
+                      <div className="image-preview">
+                        <img src={imagePreview} alt="Preview" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setImageFile(null);
+                            setImagePreview(null);
+                            document.getElementById("image-upload").value = "";
+                          }}
+                          className="remove-preview-btn"
+                        >
+                          ×
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        className="change-image-btn"
+                        onClick={() => document.getElementById("image-upload").click()}
+                      >
+                        Change Image
+                      </button>
+                    </div>
+                  ) : !imageFile && formData.image ? (
+                    <div className="current-image-container">
+                      <div className="current-image">
+                        <p>Current Image:</p>
+                        <img
+                          src={
+                            formData.image.startsWith("http")
+                              ? formData.image
+                              : `${API_URL}${formData.image}`
+                          }
+                          alt="Current"
+                          onError={e => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                        <div className="image-url-input">
+                          <input
+                            type="text"
+                            placeholder="Or enter image URL"
+                            value={formData.image}
+                            onChange={e =>
+                              setFormData({ ...formData, image: e.target.value })
+                            }
+                          />
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="change-image-btn"
+                        onClick={() => document.getElementById("image-upload").click()}
+                      >
+                        Upload New Image
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="upload-placeholder">
+                      <FaImage className="upload-icon" />
+                      <p>Drag & drop an image here, or click to browse</p>
+                      <button
+                        type="button"
+                        className="browse-btn"
+                        onClick={() => document.getElementById("image-upload").click()}
+                      >
+                        Browse Files
+                      </button>
+                      <p className="upload-hint">
+                        Supported formats: JPG, PNG, GIF, WEBP (Max 5MB)
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="form-row">

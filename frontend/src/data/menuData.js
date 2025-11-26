@@ -169,11 +169,11 @@ export const menuItems = [
     id: 15,
     name: "Sweet Lassi",
     description:
-      "Creamy sweet yogurt drink topped with chopped pistachios and dried rose petals, garnished with aromatic cardamom",
-    price: 3.99,
+      "Traditional Punjabi sweet lassi - creamy, refreshing yogurt-based drink made with homemade yogurt, whole milk, sugar, and aromatic cardamom. Topped with slivered pistachios and dried rose petals. Perfectly chilled and frothy!",
+    price: 4.99,
     category: "Beverages",
     image:
-      "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1609501676725-7186f3a1f0f9?w=800&h=600&fit=crop&q=80",
     popular: true,
   },
 ];

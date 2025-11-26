@@ -10,10 +10,25 @@ const Home = () => {
       <section className="hero">
         <div className="hero-content">
           <h1>Authentic Telangana & Andhra Cuisine</h1>
-          <p>Experience the rich flavors of South Indian delicacies</p>
+          <p>Discover the authentic taste of South India, crafted with traditional recipes and premium ingredients. From aromatic biryanis to flavorful curries, experience culinary excellence delivered to your doorstep.</p>
           <Link to="/menu" className="cta-button">
-            Explore Menu
+            Explore Our Menu
           </Link>
+        </div>
+        {/* Spice Particles Animation */}
+        <div className="spice-particles">
+          <span className="spice-particle spice-chili">🌶️</span>
+          <span className="spice-particle spice-leaf">🍃</span>
+          <span className="spice-particle spice-peppercorn">⚫</span>
+          <span className="spice-particle spice-chili">🌶️</span>
+          <span className="spice-particle spice-leaf">🍃</span>
+          <span className="spice-particle spice-peppercorn">⚫</span>
+          <span className="spice-particle spice-chili">🌶️</span>
+          <span className="spice-particle spice-leaf">🍃</span>
+          <span className="spice-particle spice-peppercorn">⚫</span>
+          <span className="spice-particle spice-chili">🌶️</span>
+          <span className="spice-particle spice-leaf">🍃</span>
+          <span className="spice-particle spice-peppercorn">⚫</span>
         </div>
       </section>
 
@@ -21,30 +36,30 @@ const Home = () => {
       <section className="featured-categories">
         <h2>Popular Categories</h2>
         <div className="category-grid">
-          <div className="category-card">
+          <Link to="/menu?category=Biryani" className="category-card">
             <img
               src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800"
               alt="Biryani"
             />
             <h3>Biryani</h3>
             <p>Fragrant rice dishes with aromatic spices</p>
-          </div>
-          <div className="category-card">
+          </Link>
+          <Link to="/menu?category=Curries" className="category-card">
             <img
               src="https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800"
               alt="Curries"
             />
             <h3>Curries</h3>
             <p>Rich and flavorful traditional curries</p>
-          </div>
-          <div className="category-card">
+          </Link>
+          <Link to="/menu?category=Breads" className="category-card">
             <img
               src="https://images.unsplash.com/photo-1608198093002-ad4e505484ba?w=800"
               alt="Breads"
             />
             <h3>Breads</h3>
             <p>Freshly baked traditional breads</p>
-          </div>
+          </Link>
         </div>
       </section>
 
@@ -85,7 +100,7 @@ const Home = () => {
             <div className="testimonial-content">
               <p>
                 "The Hyderabadi Biryani is absolutely amazing! Best I've had
-                outside of Hyderabad."
+                outside of Hyderabad. The flavors are authentic and the service is excellent."
               </p>
               <div className="testimonial-author">
                 <img
@@ -103,7 +118,7 @@ const Home = () => {
             <div className="testimonial-content">
               <p>
                 "Authentic Andhra flavors that remind me of home. The Gongura
-                Mamsam is a must-try!"
+                Mamsam is a must-try! Every dish is prepared with love and care."
               </p>
               <div className="testimonial-author">
                 <img
@@ -113,6 +128,24 @@ const Home = () => {
                 <div>
                   <h4>Priya Patel</h4>
                   <p>Food Blogger</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="testimonial-card">
+            <div className="testimonial-content">
+              <p>
+                "Fast delivery and amazing food quality! The curries are rich and flavorful. 
+                This has become our go-to place for authentic South Indian cuisine."
+              </p>
+              <div className="testimonial-author">
+                <img
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"
+                  alt="Customer"
+                />
+                <div>
+                  <h4>Arjun Reddy</h4>
+                  <p>Food Enthusiast</p>
                 </div>
               </div>
             </div>

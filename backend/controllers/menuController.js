@@ -3,6 +3,23 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
+// Cloud storage utilities (optional - only used if Cloudinary is configured)
+let cloudStorage = null;
+try {
+  if (
+    process.env.CLOUDINARY_CLOUD_NAME &&
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_SECRET
+  ) {
+    cloudStorage = require("../utils/cloudStorage");
+    console.log("✅ Cloudinary configured - using cloud storage for images");
+  } else {
+    console.log("ℹ️  Cloudinary not configured - using local storage for images");
+  }
+} catch (error) {
+  console.warn("⚠️  Cloudinary package not installed - using local storage");
+}
+
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -136,7 +153,25 @@ exports.createMenuItem = async (req, res) => {
     // Handle image upload
     let imageUrl = "";
     if (req.file) {
-      imageUrl = `/uploads/menu/${req.file.filename}`;
+      // Use Cloudinary if configured, otherwise use local storage
+      if (cloudStorage) {
+        try {
+          // Read file buffer
+          const fileBuffer = fs.readFileSync(req.file.path);
+          // Upload to Cloudinary
+          imageUrl = await cloudStorage.uploadToCloudinary(fileBuffer, "menu");
+          // Delete local file after upload
+          fs.unlinkSync(req.file.path);
+          console.log("✅ Image uploaded to Cloudinary:", imageUrl);
+        } catch (cloudError) {
+          console.error("Cloudinary upload failed, using local storage:", cloudError);
+          // Fallback to local storage
+          imageUrl = `/uploads/menu/${req.file.filename}`;
+        }
+      } else {
+        // Local storage
+        imageUrl = `/uploads/menu/${req.file.filename}`;
+      }
     } else if (req.body.image) {
       // Allow URL from frontend
       imageUrl = req.body.image;
@@ -189,13 +224,33 @@ exports.updateMenuItem = async (req, res) => {
     // Handle image upload
     if (req.file) {
       // Delete old image if exists
-      if (menuItem.image && menuItem.image.startsWith("/uploads/")) {
-        const oldImagePath = path.join(__dirname, "..", menuItem.image);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
+      if (menuItem.image) {
+        if (cloudStorage && cloudStorage.isCloudinaryUrl(menuItem.image)) {
+          // Delete from Cloudinary
+          await cloudStorage.deleteFromCloudinary(menuItem.image);
+        } else if (menuItem.image.startsWith("/uploads/")) {
+          // Delete local file
+          const oldImagePath = path.join(__dirname, "..", menuItem.image);
+          if (fs.existsSync(oldImagePath)) {
+            fs.unlinkSync(oldImagePath);
+          }
         }
       }
-      menuItem.image = `/uploads/menu/${req.file.filename}`;
+
+      // Upload new image
+      if (cloudStorage) {
+        try {
+          const fileBuffer = fs.readFileSync(req.file.path);
+          menuItem.image = await cloudStorage.uploadToCloudinary(fileBuffer, "menu");
+          fs.unlinkSync(req.file.path);
+          console.log("✅ Image updated in Cloudinary:", menuItem.image);
+        } catch (cloudError) {
+          console.error("Cloudinary upload failed, using local storage:", cloudError);
+          menuItem.image = `/uploads/menu/${req.file.filename}`;
+        }
+      } else {
+        menuItem.image = `/uploads/menu/${req.file.filename}`;
+      }
     } else if (req.body.image) {
       menuItem.image = req.body.image;
     }
@@ -255,6 +310,48 @@ exports.updateMenuItem = async (req, res) => {
 
 // Delete menu item
 exports.deleteMenuItem = async (req, res) => {
+  try {
+    const menuItem = await MenuItem.findById(req.params.id);
+    
+    if (!menuItem) {
+      return res.status(404).json({
+        success: false,
+        message: "Menu item not found",
+      });
+    }
+
+    // Delete associated image
+    if (menuItem.image) {
+      if (cloudStorage && cloudStorage.isCloudinaryUrl(menuItem.image)) {
+        // Delete from Cloudinary
+        await cloudStorage.deleteFromCloudinary(menuItem.image);
+      } else if (menuItem.image.startsWith("/uploads/")) {
+        // Delete local file
+        const imagePath = path.join(__dirname, "..", menuItem.image);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      }
+    }
+
+    await MenuItem.findByIdAndDelete(req.params.id);
+
+    // Clear public menu cache when menu is updated
+    exports.clearPublicMenuCache();
+
+    res.json({
+      success: true,
+      message: "Menu item deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting menu item:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting menu item",
+      error: error.message,
+    });
+  }
+};
   try {
     const menuItem = await MenuItem.findById(req.params.id);
     

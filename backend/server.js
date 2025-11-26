@@ -17,8 +17,11 @@ const { contactLimiter, apiLimiter } = require("./middleware/rateLimiter");
 
 const app = express();
 
-// Security middleware
-app.use(helmet());
+// Security middleware (configured to allow images)
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false, // Disable CSP for now to allow images
+}));
 
 // Compression middleware
 app.use(compression());
@@ -206,8 +209,18 @@ app.get(
   feedbackController.getMyFeedback
 );
 
-// Serve uploaded files
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Serve uploaded files (place before API routes but after CORS)
+app.use("/uploads", express.static(path.join(__dirname, "uploads"), {
+  setHeaders: (res, filePath) => {
+    // Set CORS headers for images
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    res.setHeader("Access-Control-Allow-Origin", frontendUrl);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+    // Cache images for 1 day
+    res.setHeader("Cache-Control", "public, max-age=86400");
+  }
+}));
 
 // Development: Reset rate limit endpoint
 if (process.env.NODE_ENV === "development") {

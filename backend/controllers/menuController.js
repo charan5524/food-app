@@ -352,39 +352,4 @@ exports.deleteMenuItem = async (req, res) => {
     });
   }
 };
-  try {
-    const menuItem = await MenuItem.findById(req.params.id);
-    
-    if (!menuItem) {
-      return res.status(404).json({
-        success: false,
-        message: "Menu item not found",
-      });
-    }
-
-    // Delete associated image
-    if (menuItem.image && menuItem.image.startsWith("/uploads/")) {
-      const imagePath = path.join(__dirname, "..", menuItem.image);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-    }
-
-    await MenuItem.findByIdAndDelete(req.params.id);
-
-    // Clear public menu cache when menu is deleted
-    exports.clearPublicMenuCache();
-
-    res.json({
-      success: true,
-      message: "Menu item deleted successfully",
-    });
-  } catch (error) {
-    console.error("Error deleting menu item:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error deleting menu item",
-    });
-  }
-};
 

@@ -38,7 +38,7 @@ const Home = () => {
         <div className="category-grid">
           <Link to="/menu?category=Biryani" className="category-card">
             <img
-              src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800"
+              src="/images/biryani.jpg"
               alt="Biryani"
             />
             <h3>Biryani</h3>
@@ -46,7 +46,7 @@ const Home = () => {
           </Link>
           <Link to="/menu?category=Curries" className="category-card">
             <img
-              src="https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800"
+              src="/images/curry.jpg"
               alt="Curries"
             />
             <h3>Curries</h3>
@@ -54,7 +54,7 @@ const Home = () => {
           </Link>
           <Link to="/menu?category=Breads" className="category-card">
             <img
-              src="https://images.unsplash.com/photo-1608198093002-ad4e505484ba?w=800"
+              src="/images/bread.jpg"
               alt="Breads"
             />
             <h3>Breads</h3>

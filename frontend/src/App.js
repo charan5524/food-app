@@ -299,14 +299,7 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/order"
-            element={
-              <ProtectedRoute>
-                <Order />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/order" element={<Order />} />
           <Route path="/franchise" element={<Franchise />} />
           <Route path="/catering" element={<Catering />} />
           <Route path="/cateringmenu" element={<CateringMenu />} />

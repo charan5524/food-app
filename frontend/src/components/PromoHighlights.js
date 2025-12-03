@@ -160,7 +160,7 @@ const PromoHighlights = () => {
       <div className="section-header">
         <div>
           <h2>Latest Promo Codes</h2>
-          <p>Fresh drops curated by the admin team for instant savings.</p>
+          <p>Fresh drops curated by the <span style={{whiteSpace: 'nowrap'}}>admin team for instant</span> savings.</p>
         </div>
         {promos.length > 4 && (
           <span className="promo-count-pill">{promos.length} active</span>

@@ -14,6 +14,7 @@
   position: relative;
   color: #1a1a1a;
   background: #fff7f0; /* Plain soft cream background */
+  padding: 80px 120px 100px;
 }
 
 .catering-hero-overlay {
@@ -27,8 +28,8 @@
 }
 
 .catering-hero-content {
-  max-width: 600px;
-  padding: var(--spacing-2xl);
+  max-width: 640px;
+  padding: 0;
   text-align: left;
   z-index: 1;
   animation: fadeInLeft 1s ease-out;
@@ -131,12 +132,12 @@
 }
 
 .catering-hero-title {
-  font-size: clamp(2.5rem, 5.5vw, 5rem);
+  font-size: clamp(2.25rem, 3.8vw, 3.3rem);
   font-weight: 800;
   margin-bottom: var(--spacing-xl);
   font-family: var(--font-primary);
-  line-height: 1.1;
-  letter-spacing: -1.5px;
+  line-height: 1.15;
+  letter-spacing: -1px;
   color: #1a1a1a;
   text-transform: none;
   position: relative;
@@ -160,7 +161,7 @@
 }
 
 .catering-hero-description {
-  font-size: clamp(1rem, 1.6vw, 1.15rem);
+  font-size: clamp(1rem, 1.4vw, 1.1rem);
   margin-bottom: var(--spacing-3xl);
   line-height: 1.7;
   color: #4b5563;

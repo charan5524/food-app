@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { 
   FaUtensils, 
   FaClock, 
@@ -18,31 +18,7 @@ import "./Catering.css";
 
 function Catering() {
   const navigate = useNavigate();
-  const [imageLoaded, setImageLoaded] = useState(false);
   const [selectedPackageType, setSelectedPackageType] = useState("corporate");
-
-  // Preload the image for better performance
-  useEffect(() => {
-    const imagePath = `${process.env.PUBLIC_URL}/images/catering-hero.jpg`;
-    const img = new Image();
-    img.src = imagePath;
-    img.onload = () => {
-      setImageLoaded(true);
-    };
-    img.onerror = () => {
-      // Fallback if image doesn't load
-      console.warn("Catering hero image failed to load");
-      setImageLoaded(true); // Still show the section
-    };
-  }, []);
-
-  const getBackgroundImage = () => {
-    // Use local catering hero image
-    const imagePath = `${process.env.PUBLIC_URL}/images/catering-hero.jpg`;
-    return {
-      backgroundImage: `url(${imagePath})`,
-    };
-  };
 
   const features = [
     {
@@ -178,26 +154,17 @@ function Catering() {
   return (
     <div className="catering-container">
       {/* Hero Section */}
-      <div
-        className={`catering-hero-section ${imageLoaded ? "image-loaded" : "image-loading"}`}
-        style={{
-          ...getBackgroundImage(),
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
+      <div className="catering-hero-section">
         <div className="catering-hero-overlay">
           <div className="catering-hero-content">
             <div className="hero-badge">Premium Catering Services</div>
             <h1 className="catering-hero-title">
-              <span className="title-line-1">Exquisite Cuisine</span>
-              <span className="title-line-2">for Every Occasion</span>
+              <span className="title-line-1">Catering That Makes</span>
+              <span className="title-line-2">Every Moment Special</span>
             </h1>
             <p className="catering-hero-description">
-              Elevate your event with our award-winning catering services. From intimate gatherings 
-              to grand celebrations, we deliver exceptional culinary experiences with meticulous 
-              attention to detail and uncompromising quality.
+              From small gatherings to large events, enjoy fresh, beautifully prepared dishes 
+              designed to impress.
             </p>
             <div className="catering-hero-buttons">
               <button className="cta-button primary" onClick={() => navigate("/cateringmenu")}>
@@ -206,6 +173,30 @@ function Catering() {
               <button className="cta-button secondary" onClick={() => navigate("/contact")}>
                 Contact Us
               </button>
+            </div>
+          </div>
+          <div className="catering-hero-side">
+            <div className="catering-hero-card">
+              <h4>Event Snapshot</h4>
+              <div className="catering-hero-card-item">
+                <span className="catering-hero-card-label">Guest count</span>
+                <span className="catering-hero-card-value">30 – 500+</span>
+              </div>
+              <div className="catering-hero-card-item">
+                <span className="catering-hero-card-label">Service styles</span>
+                <span className="catering-hero-card-value">Buffet · Plated · Live counters</span>
+              </div>
+              <div className="catering-hero-card-item">
+                <span className="catering-hero-card-label">Menu formats</span>
+                <span className="catering-hero-card-value">Traditional · Modern fusion</span>
+              </div>
+              <div className="catering-hero-card-item">
+                <span className="catering-hero-card-label">Lead time</span>
+                <span className="catering-hero-card-value">3–7 days for most events</span>
+              </div>
+              <p className="catering-hero-card-note">
+                Share your event details and our planners will recommend the perfect program.
+              </p>
             </div>
           </div>
         </div>

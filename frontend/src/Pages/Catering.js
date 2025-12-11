@@ -149,7 +149,7 @@ function Catering() {
     { label: "Bespoke Beverages", detail: "Zero-proof mixology & craft coolers" },
   ];
 
-  const visiblePackages = useMemo(() => cateringPackages[selectedPackageType], [selectedPackageType]);
+  const visiblePackages = useMemo(() => cateringPackages[selectedPackageType], [selectedPackageType, cateringPackages]);
 
   return (
     <div className="catering-container">

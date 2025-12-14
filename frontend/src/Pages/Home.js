@@ -10,7 +10,12 @@ const Home = () => {
       <section className="hero">
         <div className="hero-content">
           <h1>Authentic Telangana & Andhra Cuisine</h1>
-          <p>Discover the authentic taste of South India, crafted with traditional recipes and premium ingredients. From aromatic biryanis to flavorful curries, experience culinary excellence delivered to your doorstep.</p>
+          <p>
+            Discover the authentic taste of South India, crafted with
+            traditional recipes and premium ingredients. From aromatic biryanis
+            to flavorful curries, experience culinary excellence delivered to
+            your doorstep.
+          </p>
           <Link to="/menu" className="cta-button">
             Explore Our Menu
           </Link>
@@ -37,26 +42,17 @@ const Home = () => {
         <h2>Popular Categories</h2>
         <div className="category-grid">
           <Link to="/menu?category=Biryani" className="category-card">
-            <img
-              src="/images/biryani.jpg"
-              alt="Biryani"
-            />
+            <img src="/images/biryani.jpg" alt="Biryani" />
             <h3>Biryani</h3>
             <p>Fragrant rice dishes with aromatic spices</p>
           </Link>
           <Link to="/menu?category=Curries" className="category-card">
-            <img
-              src="/images/curry.jpg"
-              alt="Curries"
-            />
+            <img src="/images/curry.jpg" alt="Curries" />
             <h3>Curries</h3>
             <p>Rich and flavorful traditional curries</p>
           </Link>
           <Link to="/menu?category=Breads" className="category-card">
-            <img
-              src="/images/bread.jpg"
-              alt="Breads"
-            />
+            <img src="/images/bread.jpg" alt="Breads" />
             <h3>Breads</h3>
             <p>Freshly baked traditional breads</p>
           </Link>
@@ -100,7 +96,8 @@ const Home = () => {
             <div className="testimonial-content">
               <p>
                 "The Hyderabadi Biryani is absolutely amazing! Best I've had
-                outside of Hyderabad. The flavors are authentic and the service is excellent."
+                outside of Hyderabad. The flavors are authentic and the service
+                is excellent."
               </p>
               <div className="testimonial-author">
                 <img
@@ -118,7 +115,8 @@ const Home = () => {
             <div className="testimonial-content">
               <p>
                 "Authentic Andhra flavors that remind me of home. The Gongura
-                Mamsam is a must-try! Every dish is prepared with love and care."
+                Mamsam is a must-try! Every dish is prepared with love and
+                care."
               </p>
               <div className="testimonial-author">
                 <img
@@ -135,8 +133,9 @@ const Home = () => {
           <div className="testimonial-card">
             <div className="testimonial-content">
               <p>
-                "Fast delivery and amazing food quality! The curries are rich and flavorful. 
-                This has become our go-to place for authentic South Indian cuisine."
+                "Fast delivery and amazing food quality! The curries are rich
+                and flavorful. This has become our go-to place for authentic
+                South Indian cuisine."
               </p>
               <div className="testimonial-author">
                 <img

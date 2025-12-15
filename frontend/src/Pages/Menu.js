@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaSearch, FaShoppingCart, FaUtensils, FaTimes, FaFilter, FaSortAmountDown } from "react-icons/fa";
+import {
+  FaSearch,
+  FaShoppingCart,
+  FaUtensils,
+  FaTimes,
+  FaFilter,
+  FaSortAmountDown,
+} from "react-icons/fa";
 import MenuItem from "../components/MenuItem";
 import { MenuItemSkeleton } from "../components/LoadingSkeleton";
 import { useToast } from "../context/ToastContext";
@@ -27,7 +34,7 @@ const Menu = () => {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         // Fetch menu items and categories in parallel for better performance
         const [menuResponse, categoriesResponse] = await Promise.all([
           menuService.getAllMenuItems(),
@@ -35,7 +42,7 @@ const Menu = () => {
         ]);
 
         // Map _id to id for compatibility with existing code
-        const itemsWithId = menuResponse.menuItems.map((item) => ({
+        const itemsWithId = menuResponse.menuItems.map(item => ({
           ...item,
           id: item._id || item.id,
         }));
@@ -60,14 +67,14 @@ const Menu = () => {
 
     // Filter by category
     if (selectedCategory !== "All") {
-      filtered = filtered.filter((item) => item.category === selectedCategory);
+      filtered = filtered.filter(item => item.category === selectedCategory);
     }
 
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        (item) =>
+        item =>
           item.name.toLowerCase().includes(query) ||
           item.description.toLowerCase().includes(query) ||
           item.category?.toLowerCase().includes(query)
@@ -87,7 +94,8 @@ const Menu = () => {
   }, [menuItems, selectedCategory, searchQuery, sortBy]);
 
   // Check if any filters are active
-  const hasActiveFilters = searchQuery || selectedCategory !== "All" || sortBy !== "default";
+  const hasActiveFilters =
+    searchQuery || selectedCategory !== "All" || sortBy !== "default";
 
   // Clear all filters
   const clearAllFilters = () => {
@@ -96,8 +104,8 @@ const Menu = () => {
     setSortBy("default");
   };
 
-  const handleAddToCart = (item) => {
-    const existingItem = cartItems.find((cartItem) => cartItem.id === item.id);
+  const handleAddToCart = item => {
+    const existingItem = cartItems.find(cartItem => cartItem.id === item.id);
     if (existingItem) {
       showToast(`${item.name} quantity updated!`, "success");
     } else {
@@ -109,12 +117,37 @@ const Menu = () => {
   return (
     <div className="menu-page">
       <div className="menu-hero">
-        <div className="hero-content">
-          <div className="hero-icon">
-            <FaUtensils />
+        <div className="hero-card">
+          <div className="hero-content">
+            <div className="hero-text-section">
+              {/* Left side can be empty or minimal */}
+            </div>
+            <div className="hero-image-section">
+              <div className="hero-text-content">
+                <h1 className="menu-title">Your Next Meal Awaits</h1>
+                <p className="menu-tagline">Fresh food, just a tap away.</p>
+              </div>
+              <div className="menu-food-image">
+                <img
+                  src="/images/indian-meal.jpg"
+                  alt="Traditional Indian meal with chicken curry, ragi mudde, and fresh garnish on white plate"
+                  onError={e => {
+                    e.target.style.display = "none";
+                    if (e.target.nextSibling) {
+                      e.target.nextSibling.style.display = "flex";
+                    }
+                  }}
+                />
+                <div className="menu-food-placeholder">
+                  <div className="food-visual">
+                    <div className="curry-bowl">🍛</div>
+                    <div className="millet-balls">⚫⚫</div>
+                    <div className="garnish">🧅🌶️🍋</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <h1 className="menu-title">Our Delicious Menu</h1>
-          <p className="menu-subtitle">Explore our authentic flavors and fresh ingredients</p>
         </div>
       </div>
 
@@ -127,7 +160,7 @@ const Menu = () => {
                 type="text"
                 placeholder="Search for dishes, ingredients, or flavors..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
               />
               {searchQuery && (
                 <button
@@ -147,7 +180,7 @@ const Menu = () => {
               <select
                 className="sort-select"
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+                onChange={e => setSortBy(e.target.value)}
               >
                 <option value="default">Default</option>
                 <option value="name">Name (A-Z)</option>
@@ -179,7 +212,12 @@ const Menu = () => {
               )}
               {sortBy !== "default" && (
                 <span className="filter-chip">
-                  Sort: {sortBy === "name" ? "Name" : sortBy === "price-low" ? "Price: Low to High" : "Price: High to Low"}
+                  Sort:{" "}
+                  {sortBy === "name"
+                    ? "Name"
+                    : sortBy === "price-low"
+                    ? "Price: Low to High"
+                    : "Price: High to Low"}
                   <button onClick={() => setSortBy("default")}>
                     <FaTimes />
                   </button>
@@ -191,7 +229,7 @@ const Menu = () => {
             </button>
           </div>
         )}
-        
+
         <div className="menu-categories">
           <button
             className={`category-btn ${
@@ -202,7 +240,7 @@ const Menu = () => {
             <span className="category-icon">🍽️</span>
             <span>All</span>
           </button>
-          {categories.map((category) => (
+          {categories.map(category => (
             <button
               key={category._id || category.name}
               className={`category-btn ${
@@ -220,7 +258,10 @@ const Menu = () => {
 
         {filteredItems.length > 0 && (
           <div className="results-count">
-            <span>{filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'} found</span>
+            <span>
+              {filteredItems.length}{" "}
+              {filteredItems.length === 1 ? "item" : "items"} found
+            </span>
           </div>
         )}
       </div>
@@ -239,7 +280,7 @@ const Menu = () => {
               <MenuItemSkeleton key={index} />
             ))
           ) : filteredItems.length > 0 ? (
-            filteredItems.map((item) => (
+            filteredItems.map(item => (
               <MenuItem
                 key={item.id || item._id}
                 item={item}
@@ -256,10 +297,7 @@ const Menu = () => {
                   : "No menu items available at the moment. Please check back later."}
               </p>
               {hasActiveFilters && (
-                <button 
-                  className="clear-filters-btn"
-                  onClick={clearAllFilters}
-                >
+                <button className="clear-filters-btn" onClick={clearAllFilters}>
                   Clear All Filters
                 </button>
               )}

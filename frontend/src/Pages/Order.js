@@ -21,7 +21,7 @@ function Order() {
     })`;
   };
 
-  const handleSelection = (type) => {
+  const handleSelection = type => {
     // Prevent multiple executions
     if (redirectExecuted.current || orderType) {
       return;
@@ -33,13 +33,8 @@ function Order() {
 
     setTimeout(() => {
       setIsLoading(false);
-      if (type === "delivery") {
-        // Redirect to UberEats (only once)
-        window.open("https://www.ubereats.com", "_blank");
-      } else {
-        // Redirect to menu for pickup (only once)
-        navigate("/menu");
-      }
+      // Redirect to menu for both pickup and delivery
+      navigate("/menu");
     }, 1500);
   };
 
@@ -57,15 +52,15 @@ function Order() {
         <h1 className="fade-in">How Would You Like to Order?</h1>
         {!orderType ? (
           <div className="order-selection">
-            <button 
-              onClick={() => handleSelection("pickup")} 
+            <button
+              onClick={() => handleSelection("pickup")}
               className="btn"
               disabled={isLoading}
             >
               <FaShoppingBag className="icon" /> Order for Pickup
             </button>
-            <button 
-              onClick={() => handleSelection("delivery")} 
+            <button
+              onClick={() => handleSelection("delivery")}
               className="btn"
               disabled={isLoading}
             >
@@ -80,11 +75,7 @@ function Order() {
             {isLoading ? (
               <div className="loading-spinner"></div>
             ) : (
-              <p>
-                {orderType === "delivery"
-                  ? "Redirecting to UberEats..."
-                  : "Redirecting to menu..."}
-              </p>
+              <p>Redirecting to menu...</p>
             )}
           </div>
         )}
